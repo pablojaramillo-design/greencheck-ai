@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenCheck - Análisis Crítico de Greenwashing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #047857;
+            --primary-dark: #065f46;
+            --secondary: #dc2626;
+        }
+        
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #f9fafb;
+            color: #111827;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'IBM Plex Serif', serif;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #111827;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="max-w-5xl mx-auto p-4 md:p-8">
+        
+        <!-- PANTALLA 1: LANDING -->
+        <div id="landing-view">
+            <div class="text-center mb-12">
+                <h1 class="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-700 to-emerald-600 mb-6">
+                    GreenCheck
+                </h1>
+                <p class="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                    Herramienta web que analiza anuncios de vehículos eléctricos y estima su nivel de greenwashing a partir de evidencia visual y textual.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    ¿Por qué es importante?
+                </h2>
+                <div class="text-gray-700 space-y-4 leading-relaxed">
+                    <p>El desarrollo de tecnologías llamadas "verdes" no está exento de profundas contradicciones éticas y ambientales. Mientras el triángulo del litio (Argentina, Chile y Bolivia) se convierte en un epicentro de extracción intensiva para abastecer la industria de baterías, el Congo enfrenta una crisis humanitaria derivada de la minería del cobalto, marcada por el trabajo infantil y la degradación de los ecosistemas.</p>
+                    <p>A su vez, Indonesia vive una deforestación acelerada por la expansión de la minería del níquel, indispensable para la producción de vehículos eléctricos.</p>
+                    <p class="font-semibold border-t pt-4">Ante este panorama, se hace urgente un sistema que brinde información clara y verificable sobre el impacto real de las tecnologías que se presentan como ambientalmente responsables, permitiendo un consumo verdaderamente informado. Este principio fundamenta el proyecto de tesis doctoral en Estudios de Diseño de la Universidad Pontificia Bolivariana de Medellín, desarrollado por el profesor del Departamento de Diseño de la Universidad del Valle, Pablo Andrés Jaramillo Romero, titulado "Análisis crítico del discurso visual publicitario de vehículos eléctricos en Colombia: narrativas de sostenibilidad construidas mediante estrategias de greenwashing". En esta investigación se evidencian las estrategias discursivas y visuales utilizadas por la publicidad para construir una imagen de sostenibilidad, así como los impactos sociales y ecológicos que acompañan la producción y consumo de estas tecnologías.</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-8">
+                <button onclick="switchToAnalysis()" class="btn-primary text-lg px-8 py-4">
+                    <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Iniciar análisis crítico
+                </button>
+            </div>
+        </div>
+
+        <!-- PANTALLA 2: ANÁLISIS -->
+        <div id="analysis-view" class="hidden">
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">Análisis GreenCheck</h1>
+                <p class="text-sm text-gray-500">Herramienta de análisis crítico del discurso visual publicitario</p>
+            </header>
+
+            <div class="card bg-yellow-50 border-2 border-yellow-300">
+                <h2 class="text-xl font-bold text-yellow-900 mb-3">¿Qué es el greenwashing?</h2>
+                <p class="text-gray-800 leading-relaxed">
+                    Greenwashing o lavado verde es una estrategia de marketing contemporánea en la que la publicidad utiliza recursos visuales asociados a la naturaleza —como entornos ecológicos, hojas, gotas de agua, ondas de mar o tipografías en tonos fríos como el verde y el azul— para construir una apariencia de sostenibilidad. Estas piezas suelen transmitir sensaciones de frescura, pureza y aire limpio, con el propósito de presentar productos como ambientalmente responsables. Sin embargo, detrás de esta estética "verde" se ocultan los verdaderos impactos ambientales derivados de la extracción de materias primas necesarias para la fabricación de tecnologías modernas de energía. En esencia, el greenwashing consiste en hacer parecer ecológico un producto que no lo es, omitiendo deliberadamente el origen y las consecuencias de los recursos utilizados en su producción.
+                </p>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 mt-8">Iniciar el chequeo de publicidad</h2>
+
+            <!-- SECCIÓN 1: CARGAR IMAGEN -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">1. Cargar imagen de la publicidad</h3>
+                <input type="file" id="image-upload" accept="image/*" class="w-full p-3 border-2 border-gray-300 rounded-lg cursor-pointer">
+                <div id="image-preview-container" class="mt-4 hidden">
+                    <img id="image-preview" class="max-h-64 mx-auto rounded-lg border-2 border-gray-200" alt="Vista previa">
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: CONFIGURAR Y ANALIZAR -->
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">2. Configurar y analizar</h3>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Criterios adicionales de análisis (opcional):</label>
+                <textarea id="additional-criteria" rows="3" class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-green-600 focus:outline-none" 
+                          placeholder="Ej: Revisar huella de carbono, analizar materiales utilizados, verificar certificaciones..."></textarea>
+                
+                <div class="flex gap-4 mt-4">
+                    <button id="analyze-button" onclick="startAnalysis()" disabled class="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        Iniciar análisis
+                    </button>
+                    <button onclick="resetAnalysis()" class="btn-secondary flex-1">
+                        <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Borrar y cargar nuevo análisis
+                    </button>
+                </div>
+                
+                <!-- BOTÓN DE DIAGNÓSTICO DE API -->
+                <div class="mt-4">
+                    <button onclick="diagnosticarAPI()" class="w-full py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm font-medium">
+                        🔍 Diagnosticar conexión con API (si hay errores)
+                    </button>
+                </div>
+
+                <div id="loading" class="hidden mt-6 text-center">
+                    <div class="spinner mx-auto"></div>
+                    <p id="loading-msg" class="text-gray-600 mt-3">Analizando imagen... Este proceso puede tardar unos segundos.</p>
+                    <p class="text-xs text-gray-400 mt-1">El sistema reintentará automáticamente si hay demoras.</p>
+                </div>
+
+                <!-- Cuadro de error amigable -->
+                <div id="error-box" class="hidden mt-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <div>
+                            <p class="font-bold text-red-800 mb-1">No se pudo completar el análisis</p>
+                            <p id="error-msg" class="text-red-700 text-sm mb-3"></p>
+                            <button onclick="retryAnalysis()" class="btn-primary bg-red-600 hover:bg-red-700 text-sm py-2 px-4">
+                                🔄 Reintentar análisis
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: RESULTADOS DEL ANÁLISIS -->
+            <div id="results-section" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 mt-8">3. Resultado del análisis</h2>
+
+                <!-- ÍNDICE ZIOLO-BAK -->
+                <div class="card bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-300">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-red-400">Índice de Greenwashing Ziolo-Bak (0-100)</h3>
+                    <div id="ziolo-bak-content"></div>
+                </div>
+
+                <!-- GRÁFICO DE TELARAÑA -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Análisis de Discursos Presentes (Hickman)</h3>
+                    <div class="w-full max-w-2xl mx-auto h-96">
+                        <canvas id="radar-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- DESGLOSE DE GREENWASHING -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Desglose de puntuación de greenwashing</h3>
+                    <div id="breakdown-content" class="overflow-x-auto"></div>
+                </div>
+
+                <!-- INCOMPLETITUDES -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Incompletitudes y contexto del discurso</h3>
+                    <p class="text-sm text-gray-600 mb-4">Simulación de conceptos detectados en textos y comentarios relacionados con la publicidad</p>
+                    <div id="incompletitudes-content" class="overflow-x-auto"></div>
+                </div>
+
+                <!-- GRÁFICO DE TORTA -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Distribución de afirmaciones analizadas</h3>
+                    <div class="w-full max-w-md mx-auto h-80">
+                        <canvas id="pie-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- ANÁLISIS CUALITATIVO -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Análisis de lavado verde (Greenwashing)</h3>
+                    <div id="qualitative-analysis" class="prose max-w-none"></div>
+                </div>
+
+                <!-- NUEVO: ANÁLISIS NORMATIVO Y CERTIFICACIONES -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Análisis de cumplimiento normativo y certificaciones</h3>
+                    <div id="normative-analysis" class="space-y-4"></div>
+                </div>
+
+                <!-- NUEVO: ANÁLISIS DE PALETA CROMÁTICA -->
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Análisis de paleta cromática</h3>
+                    <p class="text-sm text-gray-500 mb-4">Extracción colorimétrica mediante cuantización de color (Color Thief) — 5 colores dominantes detectados en la imagen</p>
+                    <div id="chromatic-analysis"></div>
+                </div>
+            </div>
+
+            <footer class="mt-12 pt-6 border-t text-center text-sm text-gray-400">
+                Diseñado por Grupo de Investigación Socua Departamento de Diseño Universidad del Valle, Grupo de investigación en Diseño de la Universidad Pontificia Bolivariana de Medellín
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        // ═══════════════════════════════════════════════════════
+        // CONFIGURACIÓN DE API - IMPORTANTE
+        // ═══════════════════════════════════════════════════════
+        // Esta API key es de prueba y puede estar agotada.
+        // Para uso prolongado, obtén tu propia key gratis en:
+        // https://makersuite.google.com/app/apikey
+        // Instrucciones:
+        // 1. Ve a https://makersuite.google.com/app/apikey
+        // 2. Haz clic en "Create API key"
+        // 3. Copia la key generada
+        // 4. Reemplaza el valor de API_KEY abajo
+        // ═══════════════════════════════════════════════════════
+        
+        const API_KEY = "AIzaSyACfVRW8cMNgo8_VqEwXtB7P37q6owzY-I";
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+        
+        let base64Image = null;
+        let imageMimeType = 'image/jpeg'; // Default
+        let analysisData = {};
+        let radarChart = null;
+        let pieChart = null;
+
+        // Cambio de pantalla
+        function switchToAnalysis() {
+            console.log('Cambiando a análisis...');
+            document.getElementById('landing-view').classList.add('hidden');
+            document.getElementById('analysis-view').classList.remove('hidden');
+        }
+
+        // Reset
+        function resetAnalysis() {
+            document.getElementById('image-upload').value = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('additional-criteria').value = '';
+            document.getElementById('results-section').classList.add('hidden');
+            document.getElementById('analyze-button').disabled = true;
+            base64Image = null;
+            analysisData = {};
+            if (radarChart) radarChart.destroy();
+            if (pieChart) pieChart.destroy();
+        }
+
+        // Manejo de carga de imagen
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('image-upload').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validar que sea una imagen
+                    if (!file.type.startsWith('image/')) {
+                        alert('Por favor seleccione un archivo de imagen');
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const img = new Image();
+                        img.onload = function() {
+                            // Convertir cualquier imagen a JPEG usando canvas
+                            const canvas = document.createElement('canvas');
+                            
+                            // Redimensionar si es muy grande (máximo 2048px)
+                            let width = img.width;
+                            let height = img.height;
+                            const maxSize = 2048;
+                            
+                            if (width > maxSize || height > maxSize) {
+                                if (width > height) {
+                                    height = (height / width) * maxSize;
+                                    width = maxSize;
+                                } else {
+                                    width = (width / height) * maxSize;
+                                    height = maxSize;
+                                }
+                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // Convertir a JPEG con calidad 85%
+                            const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                            
+                            // Mostrar preview
+                            document.getElementById('image-preview').src = jpegDataUrl;
+                            document.getElementById('image-preview-container').classList.remove('hidden');
+                            
+                            // Guardar para enviar
+                            base64Image = jpegDataUrl.split(',')[1];
+                            imageMimeType = 'image/jpeg';
+                            
+                            document.getElementById('analyze-button').disabled = false;
+                            
+                            console.log('Imagen procesada:', {
+                                dimensiones: `${width}x${height}`,
+                                tamaño: (base64Image.length / 1024).toFixed(0) + ' KB',
+                                formato: 'JPEG'
+                            });
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        // Análisis
+        // Reintentar análisis manualmente
+        function retryAnalysis() {
+            document.getElementById('error-box').classList.add('hidden');
+            startAnalysis();
+        }
+
+        // FUNCIÓN DE DIAGNÓSTICO EN TIEMPO REAL
+        async function diagnosticarAPI() {
+            const msgDiv = document.getElementById('loading-msg');
+            const loadingDiv = document.getElementById('loading');
+            
+            loadingDiv.classList.remove('hidden');
+            msgDiv.innerHTML = '🔍 Diagnosticando API...<br><br>';
+            
+            const modelos = [
+                "gemini-1.5-flash",
+                "gemini-1.5-pro", 
+                "gemini-pro",
+                "gemini-pro-vision"
+            ];
+            
+            let funcionaAlguno = false;
+            
+            for (const modelo of modelos) {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`;
+                msgDiv.innerHTML += `Probando ${modelo}... `;
+                
+                try {
+                    const response = await fetch(`${url}?key=${API_KEY}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: "test" }] }]
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        msgDiv.innerHTML += `<span style="color: green; font-weight: bold;">✅ FUNCIONA</span><br>`;
+                        funcionaAlguno = true;
+                        
+                        if (modelo !== "gemini-1.5-flash") {
+                            msgDiv.innerHTML += `<br><strong style="color: red;">⚠️ PROBLEMA ENCONTRADO:</strong><br>`;
+                            msgDiv.innerHTML += `El modelo correcto es: <strong>${modelo}</strong><br>`;
+                            msgDiv.innerHTML += `Pero el código usa: gemini-1.5-flash<br><br>`;
+                            msgDiv.innerHTML += `<strong>SOLUCIÓN:</strong> Edita el archivo HTML y cambia la línea:<br>`;
+                            msgDiv.innerHTML += `<code style="background: #f0f0f0; padding: 5px;">const API_URL = "...${modelo}:generateContent";</code><br><br>`;
+                        }
+                        break;
+                    } else {
+                        const data = await response.json();
+                        msgDiv.innerHTML += `<span style="color: red;">❌ Error ${response.status}</span><br>`;
+                        if (data.error) {
+                            msgDiv.innerHTML += `<small>${data.error.message || JSON.stringify(data.error)}</small><br>`;
+                        }
+                    }
+                } catch (error) {
+                    msgDiv.innerHTML += `<span style="color: red;">❌ ${error.message}</span><br>`;
+                }
+                
+                await new Promise(r => setTimeout(r, 500));
+            }
+            
+            if (!funcionaAlguno) {
+                msgDiv.innerHTML += `<br><strong style="color: red;">❌ NINGÚN MODELO FUNCIONA</strong><br><br>`;
+                msgDiv.innerHTML += `Posibles causas:<br>`;
+                msgDiv.innerHTML += `1. La API key tiene restricciones<br>`;
+                msgDiv.innerHTML += `2. La API no está habilitada en el proyecto<br>`;
+                msgDiv.innerHTML += `3. Problema de facturación<br><br>`;
+                msgDiv.innerHTML += `Ve a: <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a><br>`;
+            } else if (!msgDiv.innerHTML.includes('PROBLEMA ENCONTRADO')) {
+                msgDiv.innerHTML += `<br><strong style="color: green;">✅ TODO CORRECTO</strong><br>`;
+                msgDiv.innerHTML += `La API funciona. Si GreenCheck falla, recarga la página (Ctrl+Shift+R).<br>`;
+            }
+        }
+
+        async function startAnalysis() {
+            if (!base64Image) {
+                alert('Por favor carga una imagen primero');
+                return;
+            }
+
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('analyze-button').disabled = true;
+            document.getElementById('results-section').classList.add('hidden');
+            document.getElementById('error-box').classList.add('hidden');
+
+            const additionalCriteria = document.getElementById('additional-criteria').value || 'Ninguno';
+
+            const systemInstruction = `Eres GreenCheck AI, un sistema experto en análisis crítico del discurso visual publicitario.
+
+GENERA UN ÚNICO OBJETO JSON con esta estructura EXACTA (sin texto adicional, solo JSON puro):
+
+{
+  "ziolo_bak": {
+    "ejecucional_empresa": {
+      "presente": true/false,
+      "componentes_detectados": "Descripción de símbolos, colores, sonidos y narrativas verdes relacionadas con la marca"
+    },
+    "afirmacion_empresa": {
+      "presente": true/false,
+      "componentes_detectados": "Descripción de declaraciones institucionales detectadas (ej: 'comprometidos con el cambio climático', 'cero emisiones', etc.)"
+    },
+    "ejecucional_producto": {
+      "presente": true/false,
+      "componentes_detectados": "Descripción de recursos visuales sostenibles (hojas, gotas, elementos ambientales por color/forma)"
+    },
+    "afirmacion_producto": {
+      "presente": true/false,
+      "componentes_detectados": "Descripción de frases ecológicas (ej: 'emisiones 0', '100% natural', 'ecológico')"
+    }
+  },
+  "discursos_hickman": {
+    "estatus_social": 75,
+    "libertad_movimiento": 85,
+    "solucion_ambiental": 60,
+    "mensaje_ecologico": 70,
+    "simplicidad_eficiencia": 50,
+    "normativas": 30
+  },
+  "desglose_greenwashing": [
+    {"criterio": "Símbolos ecológicos genéricos (hojas, tierra, etc.)", "peso": 30, "detectado": true},
+    {"criterio": "Uso de colores fríos/naturales no relacionados con el producto (azul, verde)", "peso": 20, "detectado": true},
+    {"criterio": "Entorno natural (bosque, playa, agua) como fondo del producto", "peso": 20, "detectado": false},
+    {"criterio": "Presencia de animales", "peso": 10, "detectado": false},
+    {"criterio": "Muestra el producto con familia (conexión emocional)", "peso": 5, "detectado": true},
+    {"criterio": "Elementos característicos del país (bandera, trajes típicos)", "peso": 5, "detectado": false},
+    {"criterio": "Símbolo claro como una hoja o folio de un árbol en color azul o verde", "peso": 10, "detectado": true}
+  ],
+  "incompletitudes": {
+    "valores_afirmativos": {
+      "sostenibilidad": true,
+      "libertad": true,
+      "tecnologia": true,
+      "metas_aspiracionales": false,
+      "impactos_positivos": true
+    },
+    "impactos_criticos": {
+      "extraccion_minerales": false,
+      "paises_origen": false
+    },
+    "contexto_social": {
+      "geografia_pais": false,
+      "infraestructura_carga": false,
+      "infraestructura_vial": false,
+      "climatologia": false
+    }
+  },
+  "analisis_normativo_certificaciones": {
+    "fecha_publicacion_detectada": "2023-05-15 o 'No detectada'",
+    "marco_legal_aplicable": {
+      "ley_1931_2018": {
+        "aplicable": true,
+        "descripcion": "Ley de cambio climático - Aplica a vehículos eléctricos posteriores a 2018"
+      },
+      "ley_1964_2019": {
+        "aplicable": true,
+        "beneficios_mencionados": {
+          "rebaja_impuesto_vehicular": false,
+          "descuento_soat": false,
+          "exencion_pico_placa": true
+        }
+      },
+      "normativas_locales": {
+        "mencionadas": false,
+        "descripcion": "Rebaja impuestos y parqueo preferencial"
+      }
+    },
+    "certificaciones_internacionales": {
+      "wltp_comision_europea": {
+        "presente": false,
+        "descripcion": "Sello o mención de WLTP (consumo energía, emisiones, autonomía)"
+      },
+      "ghg_protocol": {
+        "presente": false,
+        "descripcion": "Greenhouse Gas Protocol - Emisiones directas e indirectas"
+      },
+      "iso_14044": {
+        "presente": false,
+        "descripcion": "ISO 14044 - Análisis ciclo de vida (baterías, tierras raras, huella hídrica)"
+      },
+      "epa": {
+        "presente": false,
+        "descripcion": "EPA - Calidad ambiental y métricas de eficiencia"
+      }
+    },
+    "cherry_picking_detectado": {
+      "presente": false,
+      "evidencias": "Descripción de datos selectivos o escenarios que favorecen sostenibilidad sin contexto completo",
+      "ejemplos": ["Solo muestra autonomía, omite tiempo de carga", "Solo menciona cero emisiones, omite producción"]
+    },
+    "analisis_cumplimiento": "Evaluación general del cumplimiento normativo y transparencia en certificaciones"
+  },
+  "analisis_cualitativo": {
+    "identificacion_producto": "BYD Atto 3 - Vehículo eléctrico",
+    "fuente": "Facebook / Instagram",
+    "criterios_adicionales_solicitados": "Revisar huella de carbono, analizar materiales utilizados",
+    "hallazgos_criterios_adicionales": "Respecto a los criterios adicionales solicitados: [descripción de hallazgos o 'No se encontró información específica sobre estos criterios en la publicidad']",
+    "afirmaciones_clave": ["100% Ecológico", "Cero emisiones", "Movilidad sostenible"],
+    "evaluacion_greencheck": "La publicidad presenta el producto como solución ambiental absoluta, utilizando narrativas de libertad y status social. Se detecta uso estratégico de colores verdes y azules.",
+    "greenwashing_detectado": "Afirmación '100% Ecológico' es exageración que omite impactos de producción de baterías (litio, cobalto). Uso de colores fríos para crear halo de naturaleza sobre producto industrial.",
+    "puntos_verdes": "El vehículo eléctrico es genuina alternativa a combustión interna. Reduce contaminación local en uso urbano.",
+    "clasificacion": "Moderado Riesgo de Greenwashing",
+    "recomendacion": "Reemplazar '100% Ecológico' por 'Cero Emisiones en Uso'. Incluir información sobre origen de baterías y reciclaje."
+  }
+}`;
+
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { text: `Analiza esta publicidad de tecnología verde siguiendo la estructura JSON indicada.
+
+${additionalCriteria !== 'Ninguno' ? `CRITERIOS ADICIONALES SOLICITADOS POR EL USUARIO: "${additionalCriteria}"
+Por favor, en el campo "criterios_adicionales_solicitados" copia exactamente estos criterios, y en "hallazgos_criterios_adicionales" describe brevemente si encuentras información relacionada con estos criterios en la publicidad, o indica claramente si no se encontró información sobre ellos.` : ''}
+
+RESPONDE SOLO CON JSON, SIN TEXTO ADICIONAL.` },
+                        { inlineData: { mimeType: imageMimeType, data: base64Image } }
+                    ]
+                }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            // Función de llamada a API con reintentos automáticos
+            async function callGeminiAPI(payload, intentoActual = 1, maxIntentos = 3) {
+                const loadingMsg = document.getElementById('loading-msg');
+                if (loadingMsg) {
+                    loadingMsg.textContent = intentoActual > 1 
+                        ? `Reintentando... (intento ${intentoActual} de ${maxIntentos})` 
+                        : 'Analizando imagen... Este proceso puede tardar unos segundos.';
+                }
+
+                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Si es 503 o 429 y aún hay intentos, esperar y reintentar
+                if ((response.status === 503 || response.status === 429) && intentoActual < maxIntentos) {
+                    const espera = intentoActual * 4000; // 4s, 8s
+                    if (loadingMsg) loadingMsg.textContent = `Servidor ocupado. Reintentando en ${espera/1000} segundos... (${intentoActual}/${maxIntentos})`;
+                    await new Promise(resolve => setTimeout(resolve, espera));
+                    return callGeminiAPI(payload, intentoActual + 1, maxIntentos);
+                }
+
+                if (!response.ok) {
+                    const errorTexts = {
+                        404: 'El modelo de IA no está disponible o la API key ha expirado. Posibles soluciones: (1) Espere unos minutos y reintente, (2) Obtenga una API key propia en https://makersuite.google.com/app/apikey y reemplácela en el código.',
+                        503: 'El servidor de IA está temporalmente sobrecargado. Por favor intente nuevamente en unos minutos.',
+                        429: 'Se superó el límite de solicitudes. Espere un momento antes de volver a intentar.',
+                        400: 'Error en el formato de la imagen. Intente con otra imagen.',
+                        401: 'Error de autenticación con la API key. Necesita configurar una API key válida en el código.',
+                        500: 'Error interno del servidor de IA. Intente nuevamente.'
+                    };
+                    const msg = errorTexts[response.status] || `Error del servidor (código ${response.status}). Intente nuevamente.`;
+                    throw new Error(msg);
+                }
+
+                return response;
+            }
+
+            try {
+                const response = await callGeminiAPI(payload);
+                const result = await response.json();
+                
+                console.log('Respuesta completa de Gemini:', result);
+                
+                let text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                    analysisData = JSON.parse(text);
+                    displayResults();
+                } else if (result.error) {
+                    // Mostrar el error específico de Gemini
+                    throw new Error(`Error de Gemini: ${result.error.message || JSON.stringify(result.error)}`);
+                } else {
+                    throw new Error('La API no devolvió contenido. Intente nuevamente.');
+                }
+            } catch (error) {
+                console.error('Error completo:', error);
+                console.error('Tipo MIME usado:', imageMimeType);
+                console.error('Tamaño de base64:', base64Image ? base64Image.length : 0);
+                
+                // Mostrar error amigable en pantalla
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error-box').classList.remove('hidden');
+                document.getElementById('error-msg').innerHTML = error.message + 
+                    '<br><br><strong>Debug info:</strong><br>' +
+                    'Tipo MIME: ' + imageMimeType + '<br>' +
+                    'Tamaño datos: ' + (base64Image ? (base64Image.length / 1024).toFixed(0) + ' KB' : 'N/A');
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('analyze-button').disabled = false;
+            }
+        }
+
+        function displayResults() {
+            document.getElementById('results-section').classList.remove('hidden');
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+
+            displayZioloBak();
+            displayRadarChart();
+            displayBreakdown();
+            displayIncompletitudes();
+            displayPieChart();
+            displayQualitativeAnalysis();
+            displayNormativeAnalysis(); // NUEVO
+            displayChromaticAnalysis(); // NUEVO: Paleta cromática
+        }
+
+        function displayZioloBak() {
+            const zb = analysisData.ziolo_bak;
+            
+            const categories = [
+                { 
+                    label: 'Ejecucional nivel empresa', 
+                    desc: 'Uso de símbolos, colores, sonidos y narrativas verdes asociados a la marca',
+                    presente: zb.ejecucional_empresa.presente,
+                    componentes: zb.ejecucional_empresa.componentes_detectados
+                },
+                { 
+                    label: 'Afirmación nivel empresa', 
+                    desc: 'Declaraciones institucionales (ej: "comprometidos con el cambio climático", "cero emisiones")',
+                    presente: zb.afirmacion_empresa.presente,
+                    componentes: zb.afirmacion_empresa.componentes_detectados
+                },
+                { 
+                    label: 'Ejecucional nivel producto', 
+                    desc: 'Recursos visuales que aparentan sostenibilidad (hojas, gotas de agua, elementos ambientales)',
+                    presente: zb.ejecucional_producto.presente,
+                    componentes: zb.ejecucional_producto.componentes_detectados
+                },
+                { 
+                    label: 'Afirmación nivel producto', 
+                    desc: 'Frases que acompañan la publicidad (ej: "emisiones 0", "100% natural", "ecológico")',
+                    presente: zb.afirmacion_producto.presente,
+                    componentes: zb.afirmacion_producto.componentes_detectados
+                }
+            ];
+
+            let html = `
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="text-left p-3">Categoría Ziolo-Bak</th>
+                            <th class="text-left p-3">Descripción</th>
+                            <th class="text-center p-3 w-24">Presente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            categories.forEach(cat => {
+                const presente = cat.presente ? 'SÍ' : 'NO';
+                const presenteColor = cat.presente ? 'text-red-600 font-bold' : 'text-green-600 font-bold';
+                const rowBg = cat.presente ? 'bg-red-50' : 'bg-green-50';
+                
+                html += `
+                    <tr class="${rowBg}">
+                        <td class="p-3 font-semibold">${cat.label}</td>
+                        <td class="p-3 text-sm">
+                            <div class="text-gray-600 mb-1">${cat.desc}</div>
+                            <div class="text-gray-800 italic">${cat.componentes}</div>
+                        </td>
+                        <td class="p-3 text-center text-2xl ${presenteColor}">${presente}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('ziolo-bak-content').innerHTML = html;
+        }
+
+        function displayRadarChart() {
+            const ctx = document.getElementById('radar-chart').getContext('2d');
+            if (radarChart) radarChart.destroy();
+
+            const disc = analysisData.discursos_hickman;
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Estatus social', 'Libertad de movimiento', 'Solución ambiental', 'Mensaje ecológico', 'Simplicidad y eficiencia', 'Normativas gubernamentales'],
+                    datasets: [{
+                        label: 'Intensidad del discurso',
+                        data: [disc.estatus_social, disc.libertad_movimiento, disc.solucion_ambiental, disc.mensaje_ecologico, disc.simplicidad_eficiencia, disc.normativas],
+                        backgroundColor: 'rgba(5, 150, 105, 0.2)',
+                        borderColor: 'rgb(5, 150, 105)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            suggestedMin: 10,
+                            suggestedMax: 100,
+                            ticks: { stepSize: 10 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayBreakdown() {
+            const breakdown = analysisData.desglose_greenwashing;
+            let totalDetected = 0;
+
+            let html = '<table><thead><tr><th>Criterio (Discurso Implícito)</th><th class="text-center">Peso Máximo</th><th class="text-center">Detectado</th><th class="text-center">Puntuación Sumada</th></tr></thead><tbody>';
+
+            breakdown.forEach(item => {
+                const score = item.detectado ? item.peso : 0;
+                totalDetected += score;
+                const checkIcon = item.detectado ? '✓' : '✗';
+                const rowClass = item.detectado ? 'bg-red-50' : 'bg-green-50';
+
+                html += `<tr class="${rowClass}"><td>${item.criterio}</td><td class="text-center font-semibold">${item.peso}%</td><td class="text-center text-2xl">${checkIcon}</td><td class="text-center font-bold">${score}%</td></tr>`;
+            });
+
+            html += `</tbody><tfoot class="bg-red-100"><tr><td colspan="3" class="text-right font-bold text-lg">TOTAL GREENWASHING DETECTADO:</td><td class="text-center font-bold text-xl text-red-600">${totalDetected}%</td></tr></tfoot></table>`;
+
+            document.getElementById('breakdown-content').innerHTML = html;
+        }
+
+        function displayIncompletitudes() {
+            const inc = analysisData.incompletitudes;
+            
+            let html = '<table><thead><tr><th>Concepto detallado</th><th class="text-center">Mencionado</th><th class="text-center">Inferencia</th></tr></thead><tbody>';
+
+            const sections = [
+                { title: 'Valores afirmativos y metas', data: inc.valores_afirmativos, labels: ['Sostenibilidad', 'Libertad', 'Tecnología', 'Metas aspiracionales', 'Impactos positivos'] },
+                { title: 'Impactos críticos (Greenwashing faltante)', data: inc.impactos_criticos, labels: ['Extracción de minerales', 'Países de origen'] },
+                { title: 'Contexto social/operacional', data: inc.contexto_social, labels: ['Geografía del país', 'Infraestructura de carga', 'Infraestructura vial', 'Climatología'] }
+            ];
+
+            sections.forEach(section => {
+                html += `<tr class="bg-blue-100"><td colspan="3" class="font-bold">${section.title}</td></tr>`;
+                const keys = Object.keys(section.data);
+                keys.forEach((key, i) => {
+                    const mentioned = section.data[key];
+                    const icon = mentioned ? '✓' : '✗';
+                    const color = mentioned ? 'text-green-600' : 'text-red-600';
+                    html += `<tr><td>${section.labels[i]}</td><td class="text-center ${color} text-xl">${icon}</td><td class="text-center ${color} text-xl">${icon}</td></tr>`;
+                });
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('incompletitudes-content').innerHTML = html;
+        }
+
+        function displayPieChart() {
+            const breakdown = analysisData.desglose_greenwashing;
+            const greenwashing = breakdown.filter(item => item.detectado).reduce((sum, item) => sum + item.peso, 0);
+            const legitimate = 100 - greenwashing;
+
+            const ctx = document.getElementById('pie-chart').getContext('2d');
+            if (pieChart) pieChart.destroy();
+
+            pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: [`Greenwashing detectado (${greenwashing}%)`, `Afirmaciones legítimas/neutrales (${legitimate}%)`],
+                    datasets: [{
+                        data: [greenwashing, legitimate],
+                        backgroundColor: ['#dc2626', '#059669']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function displayQualitativeAnalysis() {
+            const qa = analysisData.analisis_cualitativo;
+            
+            let html = `
+                <div class="space-y-4">
+                    <div><h4 class="font-bold text-gray-900">Identificación del producto</h4><p>${qa.identificacion_producto}</p></div>
+                    <div><h4 class="font-bold text-gray-900">Fuente</h4><p>${qa.fuente}</p></div>`;
+            
+            // Mostrar criterios adicionales si fueron solicitados
+            if (qa.criterios_adicionales_solicitados && qa.criterios_adicionales_solicitados !== 'Ninguno') {
+                html += `
+                    <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-300">
+                        <h4 class="font-bold text-blue-900">Criterios adicionales solicitados</h4>
+                        <p class="text-sm text-gray-700 mb-2 italic">${qa.criterios_adicionales_solicitados}</p>
+                        <h5 class="font-semibold text-blue-800 mt-3">Hallazgos:</h5>
+                        <p class="text-gray-800">${qa.hallazgos_criterios_adicionales}</p>
+                    </div>`;
+            }
+            
+            html += `
+                    <div><h4 class="font-bold text-gray-900">Afirmaciones clave</h4><ul class="list-disc pl-5">${qa.afirmaciones_clave.map(a => `<li>${a}</li>`).join('')}</ul></div>
+                    <div><h4 class="font-bold text-gray-900">Evaluación GreenCheck</h4><p>${qa.evaluacion_greencheck}</p></div>
+                    <div class="bg-red-50 p-4 rounded-lg"><h4 class="font-bold text-red-900">Greenwashing detectado</h4><p>${qa.greenwashing_detectado}</p></div>
+                    <div class="bg-green-50 p-4 rounded-lg"><h4 class="font-bold text-green-900">Puntos verdes</h4><p>${qa.puntos_verdes}</p></div>
+                    <div class="bg-yellow-50 p-4 rounded-lg border-2 border-yellow-400"><h4 class="font-bold text-yellow-900">Clasificación GreenCheck</h4><p class="text-xl font-bold">${qa.clasificacion}</p></div>
+                    <div><h4 class="font-bold text-gray-900">Recomendación</h4><p>${qa.recomendacion}</p></div>
+                </div>
+            `;
+
+            document.getElementById('qualitative-analysis').innerHTML = html;
+        }
+
+        // NUEVA FUNCIÓN: Mostrar análisis normativo y certificaciones
+        function displayNormativeAnalysis() {
+            const na = analysisData.analisis_normativo_certificaciones;
+            
+            if (!na) {
+                document.getElementById('normative-analysis').innerHTML = '<p class="text-gray-500">No hay datos de análisis normativo disponibles.</p>';
+                return;
+            }
+            
+            let html = `
+                <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-300 mb-4">
+                    <h4 class="font-bold text-blue-900 mb-2">Fecha de publicación detectada</h4>
+                    <p class="text-lg text-gray-800">${na.fecha_publicacion_detectada || 'No detectada'}</p>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="font-bold text-gray-900 mb-3 text-lg border-b-2 border-gray-300 pb-2">Marco legal colombiano aplicable</h4>
+                    
+                    <div class="space-y-3">
+                        <div class="border-l-4 border-green-500 pl-4 py-2 ${na.marco_legal_aplicable.ley_1931_2018.aplicable ? 'bg-green-50' : 'bg-gray-50'}">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="font-semibold">Ley 1931 de 2018</span>
+                                    <p class="text-sm text-gray-600">${na.marco_legal_aplicable.ley_1931_2018.descripcion}</p>
+                                </div>
+                                <span class="text-lg font-bold ${na.marco_legal_aplicable.ley_1931_2018.aplicable ? 'text-green-600' : 'text-gray-400'}">
+                                    ${na.marco_legal_aplicable.ley_1931_2018.aplicable ? 'APLICABLE' : 'N/A'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-blue-500 pl-4 py-3 bg-blue-50">
+                            <div class="font-semibold mb-3">Ley 1964 de 2019 - Beneficios mencionados en publicidad:</div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                                <div class="flex items-center justify-between p-2 bg-white rounded">
+                                    <span>Rebaja impuesto (1%)</span>
+                                    <span class="font-bold ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.rebaja_impuesto_vehicular ? 'text-green-600' : 'text-red-600'}">
+                                        ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.rebaja_impuesto_vehicular ? 'SÍ' : 'NO'}
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between p-2 bg-white rounded">
+                                    <span>Descuento SOAT (10%)</span>
+                                    <span class="font-bold ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.descuento_soat ? 'text-green-600' : 'text-red-600'}">
+                                        ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.descuento_soat ? 'SÍ' : 'NO'}
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between p-2 bg-white rounded">
+                                    <span>Exención pico y placa</span>
+                                    <span class="font-bold ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.exencion_pico_placa ? 'text-green-600' : 'text-red-600'}">
+                                        ${na.marco_legal_aplicable.ley_1964_2019.beneficios_mencionados.exencion_pico_placa ? 'SÍ' : 'NO'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-purple-500 pl-4 py-2 ${na.marco_legal_aplicable.normativas_locales.mencionadas ? 'bg-purple-50' : 'bg-gray-50'}">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="font-semibold">Normativas locales</span>
+                                    <p class="text-sm text-gray-600">${na.marco_legal_aplicable.normativas_locales.descripcion}</p>
+                                </div>
+                                <span class="text-lg font-bold ${na.marco_legal_aplicable.normativas_locales.mencionadas ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.marco_legal_aplicable.normativas_locales.mencionadas ? 'MENCIONADO' : 'NO MENCIONADO'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="font-bold text-gray-900 mb-3 text-lg border-b-2 border-gray-300 pb-2">Certificaciones y estándares internacionales</h4>
+                    
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="text-left p-3">Certificación/Estándar</th>
+                                <th class="text-left p-3">Descripción</th>
+                                <th class="text-center p-3 w-32">Presente</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="${na.certificaciones_internacionales.wltp_comision_europea.presente ? 'bg-green-50' : 'bg-red-50'}">
+                                <td class="p-3 font-semibold">WLTP</td>
+                                <td class="p-3 text-sm">${na.certificaciones_internacionales.wltp_comision_europea.descripcion}</td>
+                                <td class="p-3 text-center text-xl font-bold ${na.certificaciones_internacionales.wltp_comision_europea.presente ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.certificaciones_internacionales.wltp_comision_europea.presente ? 'SÍ' : 'NO'}
+                                </td>
+                            </tr>
+                            <tr class="${na.certificaciones_internacionales.ghg_protocol.presente ? 'bg-green-50' : 'bg-red-50'}">
+                                <td class="p-3 font-semibold">GHG Protocol</td>
+                                <td class="p-3 text-sm">${na.certificaciones_internacionales.ghg_protocol.descripcion}</td>
+                                <td class="p-3 text-center text-xl font-bold ${na.certificaciones_internacionales.ghg_protocol.presente ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.certificaciones_internacionales.ghg_protocol.presente ? 'SÍ' : 'NO'}
+                                </td>
+                            </tr>
+                            <tr class="${na.certificaciones_internacionales.iso_14044.presente ? 'bg-green-50' : 'bg-red-50'}">
+                                <td class="p-3 font-semibold">ISO 14044</td>
+                                <td class="p-3 text-sm">${na.certificaciones_internacionales.iso_14044.descripcion}</td>
+                                <td class="p-3 text-center text-xl font-bold ${na.certificaciones_internacionales.iso_14044.presente ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.certificaciones_internacionales.iso_14044.presente ? 'SÍ' : 'NO'}
+                                </td>
+                            </tr>
+                            <tr class="${na.certificaciones_internacionales.epa.presente ? 'bg-green-50' : 'bg-red-50'}">
+                                <td class="p-3 font-semibold">EPA</td>
+                                <td class="p-3 text-sm">${na.certificaciones_internacionales.epa.descripcion}</td>
+                                <td class="p-3 text-center text-xl font-bold ${na.certificaciones_internacionales.epa.presente ? 'text-green-600' : 'text-red-600'}">
+                                    ${na.certificaciones_internacionales.epa.presente ? 'SÍ' : 'NO'}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="border-2 ${na.cherry_picking_detectado.presente ? 'border-red-500 bg-red-50' : 'border-green-500 bg-green-50'} rounded-lg p-4">
+                    <h4 class="font-bold ${na.cherry_picking_detectado.presente ? 'text-red-900' : 'text-green-900'} mb-2 flex items-center text-lg">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        Cherry Picking (Selección Selectiva de Datos)
+                    </h4>
+                    <div class="mb-2">
+                        <span class="font-semibold">Detectado: </span>
+                        <span class="text-2xl font-bold ${na.cherry_picking_detectado.presente ? 'text-red-600' : 'text-green-600'}">
+                            ${na.cherry_picking_detectado.presente ? 'SÍ' : 'NO'}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-700 mb-2"><strong>Evidencias:</strong> ${na.cherry_picking_detectado.evidencias}</p>
+                    ${na.cherry_picking_detectado.ejemplos && na.cherry_picking_detectado.ejemplos.length > 0 ? `
+                        <div class="text-sm">
+                            <strong>Ejemplos detectados:</strong>
+                            <ul class="list-disc pl-5 mt-1">
+                                ${na.cherry_picking_detectado.ejemplos.map(ej => `<li>${ej}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="mt-4 p-4 bg-gray-100 rounded-lg border-l-4 border-gray-600">
+                    <h4 class="font-bold text-gray-900 mb-2">Evaluación general de cumplimiento normativo</h4>
+                    <p class="text-gray-800">${na.analisis_cumplimiento}</p>
+                </div>
+            `;
+
+            document.getElementById('normative-analysis').innerHTML = html;
+        }
+
+        // ─────────────────────────────────────────────
+        // MÓDULO CROMÁTICO — Color Thief + clasificación
+        // ─────────────────────────────────────────────
+        function displayChromaticAnalysis() {
+            const container = document.getElementById('chromatic-analysis');
+            container.innerHTML = '<p class="text-gray-400 text-sm">Procesando paleta cromática...</p>';
+
+            const img = document.getElementById('image-preview');
+            if (!img || !img.src) {
+                container.innerHTML = '<p class="text-gray-400 text-sm">No hay imagen disponible.</p>';
+                return;
+            }
+
+            // Usamos una imagen temporal con crossOrigin para evitar problemas CORS
+            const tempImg = new Image();
+            tempImg.crossOrigin = 'Anonymous';
+            tempImg.src = img.src;
+
+            tempImg.onload = function () {
+                try {
+                    const colorThief = new ColorThief();
+                    const palette = colorThief.getPalette(tempImg, 5); // 5 colores dominantes
+                    renderPalette(palette, container);
+                } catch (e) {
+                    // Fallback: leer pixels del canvas directamente
+                    extractColorsFromCanvas(img, container);
+                }
+            };
+
+            tempImg.onerror = function () {
+                extractColorsFromCanvas(img, container);
+            };
+        }
+
+        // Fallback: extracción directa desde canvas
+        function extractColorsFromCanvas(imgEl, container) {
+            try {
+                const canvas = document.createElement('canvas');
+                const MAX = 200;
+                const scale = Math.min(MAX / imgEl.naturalWidth, MAX / imgEl.naturalHeight, 1);
+                canvas.width  = Math.max(1, Math.round(imgEl.naturalWidth  * scale));
+                canvas.height = Math.max(1, Math.round(imgEl.naturalHeight * scale));
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+                const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+                // Cuantización simple: agrupar en cubos de 32
+                const buckets = {};
+                for (let i = 0; i < data.length; i += 4) {
+                    const a = data[i + 3];
+                    if (a < 128) continue; // ignorar transparentes
+                    const r = Math.round(data[i]     / 32) * 32;
+                    const g = Math.round(data[i + 1] / 32) * 32;
+                    const b = Math.round(data[i + 2] / 32) * 32;
+                    const key = `${r},${g},${b}`;
+                    buckets[key] = (buckets[key] || 0) + 1;
+                }
+
+                const sorted = Object.entries(buckets)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5)
+                    .map(([key]) => key.split(',').map(Number));
+
+                renderPalette(sorted, container);
+            } catch (e) {
+                container.innerHTML = '<p class="text-red-500 text-sm">No se pudo extraer la paleta. Intente con una imagen diferente.</p>';
+            }
+        }
+
+        // ─── Renderiza la paleta y clasificación ───
+        function renderPalette(palette, container) {
+            // Clasificar cada color
+            const classified = palette.map(rgb => ({
+                rgb,
+                hex: rgbToHex(rgb[0], rgb[1], rgb[2]),
+                hsl: rgbToHsl(rgb[0], rgb[1], rgb[2]),
+                tipo: classifyColor(rgb[0], rgb[1], rgb[2])
+            }));
+
+            // Calcular proporción de cada tipo
+            const counts = { frio: 0, calido: 0, neutro: 0 };
+            classified.forEach(c => counts[c.tipo]++);
+            const total = classified.length;
+            const pctFrio   = Math.round((counts.frio   / total) * 100);
+            const pctCalido = Math.round((counts.calido / total) * 100);
+            const pctNeutro = Math.round((counts.neutro / total) * 100);
+
+            // Determinar clasificación general de la paleta
+            let paletaClase, paletaColor, paletaDesc;
+            if (pctFrio >= 60) {
+                paletaClase = 'PALETA FRÍA';
+                paletaColor = 'text-blue-700 bg-blue-50 border-blue-400';
+                paletaDesc  = 'Predominan colores fríos (azules, verdes, violetas). En publicidad de vehículos eléctricos esta elección evoca limpieza, tecnología y naturaleza — estrategia frecuente de greenwashing visual.';
+            } else if (pctCalido >= 60) {
+                paletaClase = 'PALETA CÁLIDA';
+                paletaColor = 'text-orange-700 bg-orange-50 border-orange-400';
+                paletaDesc  = 'Predominan colores cálidos (rojos, naranjas, amarillos). Asociados a energía, dinamismo y estatus social. Sugiere un discurso orientado al deseo y al posicionamiento más que a la sostenibilidad.';
+            } else if (pctNeutro >= 60) {
+                paletaClase = 'PALETA NEUTRA';
+                paletaColor = 'text-gray-700 bg-gray-50 border-gray-400';
+                paletaDesc  = 'Predominan tonos neutros (grises, blancos, negros, beige). Evoca sofisticación, minimalismo y lujo. Puede ocultar estrategias de greenwashing bajo una apariencia de discreción y elegancia.';
+            } else {
+                paletaClase = 'PALETA MIXTA';
+                paletaColor = 'text-purple-700 bg-purple-50 border-purple-400';
+                paletaDesc  = 'Combinación equilibrada de colores fríos, cálidos y neutros. Puede indicar una estrategia multiobjetivo que mezcla discursos de estatus, libertad y sostenibilidad simultáneamente.';
+            }
+
+            // Construir cuadrados de color (aprox. 19px ≈ 5mm en pantalla a 96 dpi)
+            const SQ = 19; // px ≈ 5mm
+            let swatchesHtml = '';
+            classified.forEach(c => {
+                const labelTipo = c.tipo === 'frio' ? '❄️' : c.tipo === 'calido' ? '🔥' : '⬜';
+                swatchesHtml += `
+                    <div class="flex flex-col items-center">
+                        <div title="${c.hex}" style="
+                            width: ${SQ}px; height: ${SQ}px;
+                            background-color: ${c.hex};
+                            border: 1px solid rgba(0,0,0,0.15);
+                            border-radius: 2px;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                        "></div>
+                        <span class="text-xs text-gray-500 mt-1" style="font-size:9px;">${c.hex}</span>
+                        <span class="text-xs mt-0" style="font-size:9px;">${labelTipo}</span>
+                    </div>
+                `;
+            });
+
+            // Barra de proporción
+            const barraHtml = `
+                <div class="flex w-full rounded overflow-hidden h-3 mt-3 mb-1" style="max-width:300px;">
+                    <div style="width:${pctFrio}%; background:#3b82f6;" title="Fríos ${pctFrio}%"></div>
+                    <div style="width:${pctCalido}%; background:#f97316;" title="Cálidos ${pctCalido}%"></div>
+                    <div style="width:${pctNeutro}%; background:#9ca3af;" title="Neutros ${pctNeutro}%"></div>
+                </div>
+                <div class="flex gap-4 text-xs text-gray-600">
+                    <span><span class="inline-block w-3 h-3 rounded-sm bg-blue-400 mr-1"></span>Fríos ${pctFrio}%</span>
+                    <span><span class="inline-block w-3 h-3 rounded-sm bg-orange-400 mr-1"></span>Cálidos ${pctCalido}%</span>
+                    <span><span class="inline-block w-3 h-3 rounded-sm bg-gray-400 mr-1"></span>Neutros ${pctNeutro}%</span>
+                </div>
+            `;
+
+            container.innerHTML = `
+                <div class="space-y-5">
+
+                    <!-- Cuadrados de colores dominantes -->
+                    <div>
+                        <p class="text-sm font-semibold text-gray-700 mb-3">5 colores dominantes (cuantización de color)</p>
+                        <div class="flex gap-4 items-end flex-wrap">
+                            ${swatchesHtml}
+                        </div>
+                    </div>
+
+                    <!-- Barra de proporciones -->
+                    <div>
+                        <p class="text-sm font-semibold text-gray-700 mb-1">Proporción por temperatura de color</p>
+                        ${barraHtml}
+                    </div>
+
+                    <!-- Clasificación de la paleta -->
+                    <div class="border-2 ${paletaColor} rounded-lg p-4">
+                        <p class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">Clasificación de la paleta</p>
+                        <p class="text-2xl font-bold mb-2">${paletaClase}</p>
+                        <p class="text-sm text-gray-700 leading-relaxed">${paletaDesc}</p>
+                    </div>
+
+                    <!-- Tabla detallada de colores -->
+                    <div>
+                        <p class="text-sm font-semibold text-gray-700 mb-2">Detalle colorimétrico</p>
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="p-2 text-left">#</th>
+                                    <th class="p-2 text-left">Muestra</th>
+                                    <th class="p-2 text-left">HEX</th>
+                                    <th class="p-2 text-left">RGB</th>
+                                    <th class="p-2 text-left">HSL</th>
+                                    <th class="p-2 text-left">Temperatura</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${classified.map((c, i) => `
+                                    <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                                        <td class="p-2 font-bold text-gray-400">${i + 1}</td>
+                                        <td class="p-2">
+                                            <div style="width:32px;height:18px;background:${c.hex};border:1px solid #e5e7eb;border-radius:3px;"></div>
+                                        </td>
+                                        <td class="p-2 font-mono font-semibold">${c.hex}</td>
+                                        <td class="p-2 font-mono text-gray-600">rgb(${c.rgb.join(', ')})</td>
+                                        <td class="p-2 font-mono text-gray-600">hsl(${c.hsl[0]}°, ${c.hsl[1]}%, ${c.hsl[2]}%)</td>
+                                        <td class="p-2">
+                                            <span class="px-2 py-1 rounded-full text-xs font-bold ${
+                                                c.tipo === 'frio'   ? 'bg-blue-100 text-blue-700'   :
+                                                c.tipo === 'calido' ? 'bg-orange-100 text-orange-700' :
+                                                                      'bg-gray-100 text-gray-600'
+                                            }">
+                                                ${c.tipo === 'frio' ? 'Frío' : c.tipo === 'calido' ? 'Cálido' : 'Neutro'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        // ─── Helpers colorimétricos ───
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+        }
+
+        function classifyColor(r, g, b) {
+            const [h, s, l] = rgbToHsl(r, g, b);
+            // Neutro: baja saturación o muy claro/oscuro
+            if (s < 15 || l < 10 || l > 90) return 'neutro';
+            // Frío: azules (180-280), verdes (90-179), violetas (280-330)
+            if ((h >= 90 && h <= 280)) return 'frio';
+            // Cálido: rojos, naranjas, amarillos (0-89 y 330-360)
+            return 'calido';
+        }
+
+    </script>
+</body>
+</html>
