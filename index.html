@@ -418,7 +418,7 @@
                 msgDiv.innerHTML += `Probando ${modelo}... `;
                 
                 try {
-                    const response = await fetch(`${url}?key=${API_KEY}`, {
+                    const response = await fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -621,7 +621,7 @@ RESPONDE SOLO CON JSON, SIN TEXTO ADICIONAL.` },
                         : 'Analizando imagen... Este proceso puede tardar unos segundos.';
                 }
 
-                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
