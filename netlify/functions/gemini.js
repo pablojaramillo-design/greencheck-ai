@@ -19,14 +19,14 @@ exports.handler = async (event) => {
   }
 
   try {
-    const API_KEY = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     
-    if (!API_KEY) {
+    if (!apiKey) {
       throw new Error('API key no configurada en Netlify');
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,17 +62,6 @@ exports.handler = async (event) => {
     };
   }
 };
-```
-
----
-
-## **✅ PASOS:**
-
-1. **Pega** todo ese código en el editor grande de GitHub
-
-2. **Verifica** que arriba diga:
-```
-   netlify/functions/gemini.js
 ```
 
 3. Abajo, en "Commit new file", escribe:
