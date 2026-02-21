@@ -10,60 +10,26 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
-
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     
-    if (!apiKey) {
-      throw new Error('API key no configurada en Netlify');
-    }
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: event.body
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        statusCode: response.status,
-        headers,
-        body: JSON.stringify(data)
-      };
-    }
-
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify({ 
+        test: "Función funciona correctamente",
+        apiKeyExists: !!apiKey,
+        apiKeyLength: apiKey ? apiKey.length : 0
+      })
     };
 
   } catch (error) {
-    console.error('Error en función Netlify:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
-        error: 'Error interno del servidor',
-        message: error.message 
+        error: error.message 
       })
     };
   }
 };
-```
-
-3. Abajo, en "Commit new file", escribe:
-```
-   Agregar función serverless Gemini
