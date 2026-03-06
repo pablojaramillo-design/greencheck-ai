@@ -475,6 +475,16 @@
 
 GENERA UN ÚNICO OBJETO JSON con esta estructura EXACTA (sin texto adicional, solo JSON puro):
 
+INSTRUCCIONES CRÍTICAS PARA EL CAMPO "clasificacion":
+Debes calcular la clasificación según la puntuación de greenwashing detectada:
+- Si la puntuación es 0-25: usa "Greenwashing Bajo"
+- Si la puntuación es 26-50: usa "Greenwashing Medio"
+- Si la puntuación es 51-75: usa "Greenwashing Moderado"
+- Si la puntuación es 76-100: usa "Greenwashing Alto"
+
+La puntuación se calcula sumando los pesos de los criterios detectados en "desglose_greenwashing".
+IMPORTANTE: NO uses siempre "Moderado". Calcula la puntuación real y clasifica correctamente.
+
 {
   "ziolo_bak": {
     "ejecucional_empresa": {
@@ -584,7 +594,7 @@ GENERA UN ÚNICO OBJETO JSON con esta estructura EXACTA (sin texto adicional, so
     "evaluacion_greencheck": "La publicidad presenta el producto como solución ambiental absoluta, utilizando narrativas de libertad y status social. Se detecta uso estratégico de colores verdes y azules.",
     "greenwashing_detectado": "Afirmación '100% Ecológico' es exageración que omite impactos de producción de baterías (litio, cobalto). Uso de colores fríos para crear halo de naturaleza sobre producto industrial.",
     "puntos_verdes": "El vehículo eléctrico es genuina alternativa a combustión interna. Reduce contaminación local en uso urbano.",
-    "clasificacion": "Moderado Riesgo de Greenwashing",
+    "clasificacion": "[CALCULA SEGÚN INSTRUCCIONES: Bajo 0-25 / Medio 26-50 / Moderado 51-75 / Alto 76-100]"
     "recomendacion": "Reemplazar '100% Ecológico' por 'Cero Emisiones en Uso'. Incluir información sobre origen de baterías y reciclaje."
   }
 }`;
