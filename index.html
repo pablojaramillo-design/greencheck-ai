@@ -734,8 +734,18 @@ RESPONDE SOLO CON JSON, SIN TEXTO ADICIONAL.` },
                 let text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
                 if (text) {
-                    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                    analysisData = JSON.parse(text);
+                   // Limpiar markdown y extraer solo el JSON válido
+text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+// Encontrar el primer { y el último } para extraer solo el JSON
+const firstBrace = text.indexOf('{');
+const lastBrace = text.lastIndexOf('}');
+
+if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    text = text.substring(firstBrace, lastBrace + 1);
+}
+
+analysisData = JSON.parse(text);
                     displayResults();
                 } else if (result.error) {
                     // Mostrar el error específico de Gemini
