@@ -98,6 +98,36 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Forzar impresión de colores de fondo para paleta cromática */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    /* Asegurar que los swatches de color se impriman */
+    div[style*="background-color"] {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+```
+
+---
+
+## 📊 DEBERÍA QUEDAR ASÍ:
+```
+Línea 98: ...
+Línea 99: ...
+Línea 100:     }
+Línea 101: 
+Línea 102: /* Forzar impresión de colores de fondo para paleta cromática */
+Línea 103: @media print {
+...
+Línea 113: }
+Línea 114: </style>
     </style>
 </head>
 <body>
