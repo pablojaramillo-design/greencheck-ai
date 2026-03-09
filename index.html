@@ -977,7 +977,16 @@ RESPONDE SOLO CON JSON, SIN TEXTO ADICIONAL.` },
 
         function displayPieChart() {
             const breakdown = analysisData.desglose_greenwashing;
-            const greenwashing = breakdown.filter(item => item.detectado).reduce((sum, item) => sum + item.peso, 0);
+            let greenwashing = 0;
+            if (breakdown.dimension_semantica) {
+    greenwashing += breakdown.dimension_semantica.criterios.filter(item => item.detectado).reduce((sum, item) => sum + item.peso, 0);
+}
+if (breakdown.dimension_composicional) {
+    greenwashing += breakdown.dimension_composicional.criterios.filter(item => item.detectado).reduce((sum, item) => sum + item.peso, 0);
+}
+if (breakdown.dimension_interactiva) {
+    greenwashing += breakdown.dimension_interactiva.criterios.filter(item => item.detectado).reduce((sum, item) => sum + item.peso, 0);
+}
             const legitimate = 100 - greenwashing;
 
             const ctx = document.getElementById('pie-chart').getContext('2d');
