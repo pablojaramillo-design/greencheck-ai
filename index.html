@@ -485,6 +485,27 @@ Debes calcular la clasificación según la puntuación de greenwashing detectada
 La puntuación se calcula sumando los pesos de los criterios detectados en "desglose_greenwashing".
 IMPORTANTE: NO uses siempre "Moderado". Calcula la puntuación real y clasifica correctamente.
 
+INSTRUCCIONES PARA "desglose_greenwashing":
+El desglose ahora está organizado en 3 DIMENSIONES según Kress & van Leeuwen (2006):
+
+1. DIMENSIÓN SEMÁNTICA (Significado ambiental) - Peso total: 65 puntos
+   - Iconografía ecológica explícita (hojas, planeta, energía limpia): 25 puntos
+   - Escenarios naturales asociados a sostenibilidad: 20 puntos
+   - Presencia de fauna o biodiversidad: 10 puntos
+   - Representación de paisaje local o territorial: 10 puntos
+
+2. DIMENSIÓN COMPOSICIONAL (Estética del mensaje) - Peso total: 25 puntos
+   - Uso dominante de paletas cromáticas verdes o azules: 10 puntos
+   - Estética tecnológica minimalista (fondos limpios, iluminación fría): 10 puntos
+   - Tipografía tecnológica (sans serif, estilo corporativo limpio): 5 puntos
+
+3. DIMENSIÓN INTERACTIVA (Relación con el espectador) - Peso total: 10 puntos
+   - Escenas emocionales (familia, bienestar, estilo de vida): 5 puntos
+   - Asociación implícita entre producto y bienestar ambiental: 5 puntos
+
+IMPORTANTE: Analiza cada dimensión independientemente y marca "detectado": true/false para cada criterio.
+La puntuación total (0-100) se calcula sumando los pesos de TODOS los criterios detectados.
+
 {
   "ziolo_bak": {
     "ejecucional_empresa": {
@@ -512,15 +533,35 @@ IMPORTANTE: NO uses siempre "Moderado". Calcula la puntuación real y clasifica 
     "simplicidad_eficiencia": 50,
     "normativas": 30
   },
-  "desglose_greenwashing": [
-    {"criterio": "Símbolos ecológicos genéricos (hojas, tierra, etc.)", "peso": 30, "detectado": true},
-    {"criterio": "Uso de colores fríos/naturales no relacionados con el producto (azul, verde)", "peso": 20, "detectado": true},
-    {"criterio": "Entorno natural (bosque, playa, agua) como fondo del producto", "peso": 20, "detectado": false},
-    {"criterio": "Presencia de animales", "peso": 10, "detectado": false},
-    {"criterio": "Muestra el producto con familia (conexión emocional)", "peso": 5, "detectado": true},
-    {"criterio": "Elementos característicos del país (bandera, trajes típicos)", "peso": 5, "detectado": false},
-    {"criterio": "Símbolo claro como una hoja o folio de un árbol en color azul o verde", "peso": 10, "detectado": true}
-  ],
+ "desglose_greenwashing": {
+  "dimension_semantica": {
+    "nombre": "DIMENSIÓN SEMÁNTICA (Significado ambiental)",
+    "peso_total": 65,
+    "criterios": [
+      {"criterio": "Iconografía ecológica explícita (hojas, planeta, energía limpia)", "peso": 25, "detectado": true},
+      {"criterio": "Escenarios naturales asociados a sostenibilidad", "peso": 20, "detectado": true},
+      {"criterio": "Presencia de fauna o biodiversidad", "peso": 10, "detectado": false},
+      {"criterio": "Representación de paisaje local o territorial", "peso": 10, "detectado": false}
+    ]
+  },
+  "dimension_composicional": {
+    "nombre": "DIMENSIÓN COMPOSICIONAL (Estética del mensaje)",
+    "peso_total": 25,
+    "criterios": [
+      {"criterio": "Uso dominante de paletas cromáticas verdes o azules", "peso": 10, "detectado": true},
+      {"criterio": "Estética tecnológica minimalista (fondos limpios, iluminación fría)", "peso": 10, "detectado": true},
+      {"criterio": "Tipografía tecnológica (sans serif, estilo corporativo limpio)", "peso": 5, "detectado": false}
+    ]
+  },
+  "dimension_interactiva": {
+    "nombre": "DIMENSIÓN INTERACTIVA (Relación con el espectador)",
+    "peso_total": 10,
+    "criterios": [
+      {"criterio": "Escenas emocionales (familia, bienestar, estilo de vida)", "peso": 5, "detectado": true},
+      {"criterio": "Asociación implícita entre producto y bienestar ambiental", "peso": 5, "detectado": true}
+    ]
+  }
+},
   "incompletitudes": {
     "valores_afirmativos": {
       "sostenibilidad": true,
@@ -803,24 +844,80 @@ RESPONDE SOLO CON JSON, SIN TEXTO ADICIONAL.` },
         }
 
         function displayBreakdown() {
-            const breakdown = analysisData.desglose_greenwashing;
-            let totalDetected = 0;
-
-            let html = '<table><thead><tr><th>Criterio (Discurso Implícito)</th><th class="text-center">Peso Máximo</th><th class="text-center">Detectado</th><th class="text-center">Puntuación Sumada</th></tr></thead><tbody>';
-
-            breakdown.forEach(item => {
-                const score = item.detectado ? item.peso : 0;
-                totalDetected += score;
-                const checkIcon = item.detectado ? '✓' : '✗';
-                const rowClass = item.detectado ? 'bg-red-50' : 'bg-green-50';
-
-                html += `<tr class="${rowClass}"><td>${item.criterio}</td><td class="text-center font-semibold">${item.peso}%</td><td class="text-center text-2xl">${checkIcon}</td><td class="text-center font-bold">${score}%</td></tr>`;
-            });
-
-            html += `</tbody><tfoot class="bg-red-100"><tr><td colspan="3" class="text-right font-bold text-lg">TOTAL GREENWASHING DETECTADO:</td><td class="text-center font-bold text-xl text-red-600">${totalDetected}%</td></tr></tfoot></table>`;
-
-            document.getElementById('breakdown-content').innerHTML = html;
-        }
+    const breakdown = analysisData.desglose_greenwashing;
+    let totalDetected = 0;
+    
+    let html = '<div class="space-y-6">';
+    
+    // Dimensión Semántica
+    if (breakdown.dimension_semantica) {
+        let semanticaDetected = 0;
+        html += `<div class="border-l-4 border-blue-500 pl-4">
+            <h4 class="font-bold text-lg mb-3">${breakdown.dimension_semantica.nombre} (${breakdown.dimension_semantica.peso_total} puntos)</h4>
+            <table class="w-full"><thead><tr><th class="text-left">Criterio</th><th class="text-center w-24">Peso</th><th class="text-center w-20">Detectado</th></tr></thead><tbody>`;
+        
+        breakdown.dimension_semantica.criterios.forEach(item => {
+            const score = item.detectado ? item.peso : 0;
+            semanticaDetected += score;
+            const checkIcon = item.detectado ? '✓' : '✗';
+            const rowClass = item.detectado ? 'bg-red-50' : 'bg-green-50';
+            html += `<tr class="${rowClass}"><td class="py-2">${item.criterio}</td><td class="text-center font-semibold">${item.peso}</td><td class="text-center text-xl">${checkIcon}</td></tr>`;
+        });
+        
+        html += `</tbody></table>
+            <p class="text-right font-bold mt-2">Subtotal: ${semanticaDetected} / ${breakdown.dimension_semantica.peso_total}</p>
+        </div>`;
+        totalDetected += semanticaDetected;
+    }
+    
+    // Dimensión Composicional
+    if (breakdown.dimension_composicional) {
+        let composicionalDetected = 0;
+        html += `<div class="border-l-4 border-purple-500 pl-4">
+            <h4 class="font-bold text-lg mb-3">${breakdown.dimension_composicional.nombre} (${breakdown.dimension_composicional.peso_total} puntos)</h4>
+            <table class="w-full"><thead><tr><th class="text-left">Criterio</th><th class="text-center w-24">Peso</th><th class="text-center w-20">Detectado</th></tr></thead><tbody>`;
+        
+        breakdown.dimension_composicional.criterios.forEach(item => {
+            const score = item.detectado ? item.peso : 0;
+            composicionalDetected += score;
+            const checkIcon = item.detectado ? '✓' : '✗';
+            const rowClass = item.detectado ? 'bg-red-50' : 'bg-green-50';
+            html += `<tr class="${rowClass}"><td class="py-2">${item.criterio}</td><td class="text-center font-semibold">${item.peso}</td><td class="text-center text-xl">${checkIcon}</td></tr>`;
+        });
+        
+        html += `</tbody></table>
+            <p class="text-right font-bold mt-2">Subtotal: ${composicionalDetected} / ${breakdown.dimension_composicional.peso_total}</p>
+        </div>`;
+        totalDetected += composicionalDetected;
+    }
+    
+    // Dimensión Interactiva
+    if (breakdown.dimension_interactiva) {
+        let interactivaDetected = 0;
+        html += `<div class="border-l-4 border-green-500 pl-4">
+            <h4 class="font-bold text-lg mb-3">${breakdown.dimension_interactiva.nombre} (${breakdown.dimension_interactiva.peso_total} puntos)</h4>
+            <table class="w-full"><thead><tr><th class="text-left">Criterio</th><th class="text-center w-24">Peso</th><th class="text-center w-20">Detectado</th></tr></thead><tbody>`;
+        
+        breakdown.dimension_interactiva.criterios.forEach(item => {
+            const score = item.detectado ? item.peso : 0;
+            interactivaDetected += score;
+            const checkIcon = item.detectado ? '✓' : '✗';
+            const rowClass = item.detectado ? 'bg-red-50' : 'bg-green-50';
+            html += `<tr class="${rowClass}"><td class="py-2">${item.criterio}</td><td class="text-center font-semibold">${item.peso}</td><td class="text-center text-xl">${checkIcon}</td></tr>`;
+        });
+        
+        html += `</tbody></table>
+            <p class="text-right font-bold mt-2">Subtotal: ${interactivaDetected} / ${breakdown.dimension_interactiva.peso_total}</p>
+        </div>`;
+        totalDetected += interactivaDetected;
+    }
+    
+    html += `<div class="bg-red-100 p-4 rounded-lg">
+        <p class="text-right font-bold text-xl">TOTAL GREENWASHING DETECTADO: ${totalDetected} / 100</p>
+    </div></div>`;
+    
+    document.getElementById('breakdown-content').innerHTML = html;
+}
 
         function displayIncompletitudes() {
             const inc = analysisData.incompletitudes;
