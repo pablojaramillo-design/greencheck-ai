@@ -330,7 +330,7 @@ Línea 114: </style>
                 <!-- INCOMPLETITUDES -->
                 <div class="card">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Incompletitudes y contexto del discurso</h3>
-                    <p class="text-sm text-gray-600 mb-4">Simulación de conceptos detectados en textos y comentarios relacionados con la publicidad</p>
+                    
                     <div id="incompletitudes-content" class="overflow-x-auto"></div>
                 </div>
 
@@ -657,23 +657,32 @@ La puntuación total (0-100) se calcula sumando los pesos de TODOS los criterios
     ]
   }
 },
-  "incompletitudes": {
-    "valores_afirmativos": {
+ "incompletitudes": {
+    "valores_explicitos": {
       "sostenibilidad": true,
-      "libertad": true,
-      "tecnologia": true,
-      "metas_aspiracionales": false,
-      "impactos_positivos": true
+      "innovacion_tecnologica": true,
+      "libertad_movimiento": true,
+      "estilo_vida_aspiracional": false,
+      "eficiencia_energetica": true
     },
-    "impactos_criticos": {
-      "extraccion_minerales": false,
-      "paises_origen": false
+    "impactos_positivos_declarados": {
+      "reduccion_emisiones": true,
+      "ahorro_energetico": false,
+      "movilidad_limpia": true
     },
-    "contexto_social": {
-      "geografia_pais": false,
-      "infraestructura_carga": false,
-      "infraestructura_vial": false,
-      "climatologia": false
+    "incompletitudes_discursivas": {
+      "extraccion_minerales_criticos": false,
+      "paises_origen_materiales": false,
+      "impactos_socioambientales_mineria": false,
+      "reciclabilidad_vehiculo_baterias": false,
+      "huella_carbono_fabricacion": false,
+      "infraestructura_carga_disponible": false,
+      "dependencia_energetica_red": false,
+      "costos_mantenimiento_baterias": false
+    },
+    "transparencia_comercial": {
+      "precio_visible_completo": false,
+      "informacion_redirigida_mensaje_privado": true
     }
   },
   "analisis_normativo_certificaciones": {
@@ -1024,29 +1033,117 @@ analysisData = JSON.parse(text);
     document.getElementById('breakdown-content').innerHTML = html;
 }
 
-        function displayIncompletitudes() {
+     function displayIncompletitudes() {
             const inc = analysisData.incompletitudes;
-            
-            let html = '<table><thead><tr><th>Concepto detallado</th><th class="text-center">Mencionado</th><th class="text-center">Inferencia</th></tr></thead><tbody>';
 
-            const sections = [
-                { title: 'Valores afirmativos y metas', data: inc.valores_afirmativos, labels: ['Sostenibilidad', 'Libertad', 'Tecnología', 'Metas aspiracionales', 'Impactos positivos'] },
-                { title: 'Impactos críticos (Greenwashing faltante)', data: inc.impactos_criticos, labels: ['Extracción de minerales', 'Países de origen'] },
-                { title: 'Contexto social/operacional', data: inc.contexto_social, labels: ['Geografía del país', 'Infraestructura de carga', 'Infraestructura vial', 'Climatología'] }
+            const bloques = [
+                {
+                    id: 'A',
+                    titulo: 'A. Valores explícitos',
+                    subtitulo: 'Lo que la publicidad afirma',
+                    headerColor: 'bg-blue-200',
+                    rowAlt: 'bg-blue-50',
+                    data: inc.valores_explicitos,
+                    labels: {
+                        sostenibilidad: 'Sostenibilidad',
+                        innovacion_tecnologica: 'Innovación tecnológica',
+                        libertad_movimiento: 'Libertad de movimiento',
+                        estilo_vida_aspiracional: 'Estilo de vida aspiracional',
+                        eficiencia_energetica: 'Eficiencia energética'
+                    }
+                },
+                {
+                    id: 'B',
+                    titulo: 'B. Impactos positivos declarados',
+                    subtitulo: 'Beneficios ambientales que la publicidad enuncia',
+                    headerColor: 'bg-green-200',
+                    rowAlt: 'bg-green-50',
+                    data: inc.impactos_positivos_declarados,
+                    labels: {
+                        reduccion_emisiones: 'Reducción de emisiones',
+                        ahorro_energetico: 'Ahorro energético',
+                        movilidad_limpia: 'Movilidad limpia'
+                    }
+                },
+                {
+                    id: 'C',
+                    titulo: 'C. Incompletitudes discursivas',
+                    subtitulo: 'Información estructural ausente — Van Dijk',
+                    headerColor: 'bg-red-200',
+                    rowAlt: 'bg-red-50',
+                    data: inc.incompletitudes_discursivas,
+                    labels: {
+                        extraccion_minerales_criticos: 'Extracción de minerales críticos (litio, cobalto, níquel)',
+                        paises_origen_materiales: 'Países de origen de los materiales',
+                        impactos_socioambientales_mineria: 'Impactos socioambientales de la minería',
+                        reciclabilidad_vehiculo_baterias: 'Reciclabilidad del vehículo o baterías',
+                        huella_carbono_fabricacion: 'Huella de carbono en fabricación',
+                        infraestructura_carga_disponible: 'Infraestructura de carga disponible',
+                        dependencia_energetica_red: 'Dependencia energética de la red eléctrica',
+                        costos_mantenimiento_baterias: 'Costos reales de mantenimiento o reemplazo de baterías'
+                    }
+                },
+                {
+                    id: 'D',
+                    titulo: 'D. Transparencia comercial',
+                    subtitulo: 'Retención de información en redes sociales',
+                    headerColor: 'bg-yellow-200',
+                    rowAlt: 'bg-yellow-50',
+                    data: inc.transparencia_comercial,
+                    labels: {
+                        precio_visible_completo: 'Precio visible o completo en la publicidad',
+                        informacion_redirigida_mensaje_privado: 'Información redirigida a mensaje privado'
+                    }
+                }
             ];
 
-            sections.forEach(section => {
-                html += `<tr class="bg-blue-100"><td colspan="3" class="font-bold">${section.title}</td></tr>`;
-                const keys = Object.keys(section.data);
-                keys.forEach((key, i) => {
-                    const mentioned = section.data[key];
-                    const icon = mentioned ? '✓' : '✗';
-                    const color = mentioned ? 'text-green-600' : 'text-red-600';
-                    html += `<tr><td>${section.labels[i]}</td><td class="text-center ${color} text-xl">${icon}</td><td class="text-center ${color} text-xl">${icon}</td></tr>`;
+            let html = '<div class="space-y-6">';
+
+            bloques.forEach(bloque => {
+                html += `
+                    <div class="rounded-lg overflow-hidden border border-gray-200">
+                        <div class="px-4 py-3 ${bloque.headerColor}">
+                            <h4 class="font-bold text-gray-900">${bloque.titulo}</h4>
+                            <p class="text-xs text-gray-600 mt-0.5">${bloque.subtitulo}</p>
+                        </div>
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="text-left px-4 py-2 text-sm">Concepto / Dimensión</th>
+                                    <th class="text-center px-4 py-2 text-sm w-28">Detectado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                Object.keys(bloque.labels).forEach((key, i) => {
+                    const valor = bloque.data?.[key];
+                    const si = valor === true;
+                    const rowBg = i % 2 === 0 ? 'bg-white' : bloque.rowAlt;
+                    const icon = si ? '✓' : '✗';
+                    const iconColor = si ? 'text-green-600' : 'text-red-500';
+                    const texto = si ? 'Sí' : 'No';
+
+                    html += `
+                        <tr class="${rowBg}">
+                            <td class="px-4 py-2 text-sm text-gray-800">${bloque.labels[key]}</td>
+                            <td class="px-4 py-2 text-center">
+                                <span class="inline-flex items-center gap-1 font-bold text-sm ${iconColor}">
+                                    ${icon} ${texto}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
                 });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
             });
 
-            html += '</tbody></table>';
+            html += '</div>';
             document.getElementById('incompletitudes-content').innerHTML = html;
         }
 
