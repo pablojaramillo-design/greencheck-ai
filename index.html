@@ -99,18 +99,83 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Forzar impresión de colores de fondo para paleta cromática */
+     /* ============================================
+   ESTILOS PROFESIONALES PARA IMPRESIÓN PDF
+   ============================================ */
 @media print {
+    /* Forzar impresión de colores de fondo */
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         color-adjust: exact !important;
     }
     
-    /* Asegurar que los swatches de color se impriman */
+    /* Configuración de página */
+    @page {
+        size: letter;
+        margin: 2cm 1.5cm;
+    }
+    
+    /* Evitar cortes de página en secciones críticas */
+    .card,
+    #results-section > div,
+    #breakdown-content > div,
+    #incompletitudes-content,
+    #chromatic-analysis,
+    canvas {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    
+    /* Mantener títulos con su contenido */
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid;
+        break-after: avoid;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    
+    /* Evitar huérfanos y viudas */
+    p {
+        orphans: 3;
+        widows: 3;
+    }
+    
+    /* Gráficos y canvas */
+    canvas {
+        max-width: 100% !important;
+        height: auto !important;
+        page-break-before: avoid;
+        page-break-after: avoid;
+    }
+    
+    /* Paleta cromática - forzar colores */
     div[style*="background-color"] {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+    }
+    
+    /* Tablas - evitar cortes */
+    table {
+        page-break-inside: avoid;
+    }
+    
+    /* Ocultar elementos innecesarios en impresión */
+    button,
+    .no-print {
+        display: none !important;
+    }
+    
+    /* Optimizar márgenes y espaciado */
+    body {
+        font-size: 11pt;
+        line-height: 1.4;
+    }
+    
+    /* Asegurar que las 3 dimensiones del desglose no se corten */
+    .border-l-4 {
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
     }
 }
 ```
