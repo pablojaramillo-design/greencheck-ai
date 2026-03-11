@@ -772,7 +772,7 @@ RESPONDE SOLO CON JSON, SIN TEXTO ADICIONAL.` },
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                   body: JSON.stringify({...payload, generationConfig: { temperature: 0.1 }})
                 });
 
                 // Si es 503 o 429 y aún hay intentos, esperar y reintentar
