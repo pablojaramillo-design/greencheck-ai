@@ -323,7 +323,7 @@ Línea 114: </style>
 
                 <!-- DESGLOSE DE GREENWASHING -->
                 <div class="card">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Desglose de puntuación de greenwashing</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Análisis de recursos discursivo-visuales asociados a la construcción ambiental</h3>
                     <div id="breakdown-content" class="overflow-x-auto"></div>
                 </div>
 
@@ -344,7 +344,7 @@ Línea 114: </style>
 
                 <!-- ANÁLISIS CUALITATIVO -->
                 <div class="card">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Análisis de lavado verde (Greenwashing)</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Índice heurístico de indicios de greenwashing</h3>
                     <div id="qualitative-analysis" class="prose max-w-none"></div>
                 </div>
 
@@ -568,6 +568,11 @@ Línea 114: </style>
 
             const systemInstruction = `Eres GreenCheck AI, un sistema experto en análisis crítico del discurso visual publicitario.
 
+INSTRUCCIÓN CRÍTICA — EVALUACIÓN PREVIA DE ALEGACIÓN AMBIENTAL:
+Antes de determinar la existencia o el nivel de greenwashing, identifica si la pieza contiene una alegación ambiental explícita o si construye una alegación ambiental implícita suficientemente sustentada por la convergencia de recursos visuales y discursivos. No interpretes automáticamente como alegaciones ambientales las características técnicas del vehículo —como autonomía, potencia, tecnología o desempeño— ni recursos compositivos aislados —como colores verdes o azules, paletas frías, tipografía sans serif, estética minimalista o tecnológica—. Estos elementos pueden describirse como recursos discursivos o compositivos, pero por sí solos no constituyen evidencia suficiente de greenwashing.
+Aplica un principio de pertinencia y proporcionalidad: la ausencia de información sobre extracción de minerales, fabricación de baterías, huella de carbono, origen de la energía, reciclabilidad, ciclo de vida u otros impactos ambientales solo debe considerarse una omisión significativa cuando esa información sea materialmente necesaria para comprobar, contextualizar o delimitar una alegación ambiental efectivamente formulada por la pieza. La ausencia de dicha información no constituye por sí misma greenwashing y no debe penalizarse cuando la publicidad no realiza una promesa ambiental relacionada con ella.
+Distingue entre selección informativa inherente al formato publicitario y omisión estratégica. Una pieza publicitaria no está obligada a informar sobre todos los impactos ambientales del producto; evalúa únicamente si existe una discrepancia relevante entre lo que la publicidad afirma o sugiere ambientalmente y la evidencia que proporciona para sustentar esa afirmación. Cuanto más amplia, absoluta o general sea la promesa ambiental, mayor deberá ser la exigencia de sustento, verificabilidad y contextualización.
+Si no se identifica una alegación ambiental explícita ni una construcción ambiental implícita suficientemente sustentada, indícalo expresamente en el campo "clasificacion" usando el valor "Sin indicios suficientes de greenwashing" y explica las razones en "evaluacion_greencheck". En ese caso, no atribuyas greenwashing únicamente por tratarse de un vehículo eléctrico, por su estética tecnológica, por su paleta cromática o por la ausencia de información sobre su ciclo de vida. Si existen indicios, identifica exactamente qué elemento visual o verbal los produce, qué criterio analítico permite interpretarlo de ese modo y qué información sería pertinente para comprobar o contextualizar específicamente esa alegación.
 GENERA UN ÚNICO OBJETO JSON con esta estructura EXACTA (sin texto adicional, solo JSON puro):
 
 INSTRUCCIONES CRÍTICAS PARA EL CAMPO "clasificacion":
@@ -581,24 +586,28 @@ La puntuación se calcula sumando los pesos de los criterios detectados en "desg
 IMPORTANTE: NO uses siempre "Moderado". Calcula la puntuación real y clasifica correctamente.
 
 INSTRUCCIONES PARA "desglose_greenwashing":
-El desglose ahora está organizado en 3 DIMENSIONES según Kress & van Leeuwen (2006):
+El desglose está organizado en 3 DIMENSIONES según Kress & van Leeuwen (2006) — Gramática del diseño visual:
 
-1. DIMENSIÓN SEMÁNTICA (Significado ambiental) - Peso total: 65 puntos
-   - Iconografía ecológica explícita (hojas, planeta, energía limpia): 25 puntos
-   - Escenarios naturales asociados a sostenibilidad: 20 puntos
-   - Presencia de fauna o biodiversidad: 10 puntos
-   - Representación de paisaje local o territorial: 10 puntos
+IMPORTANTE — GATE DE PERTINENCIA AMBIENTAL:
+Antes de asignar cualquier puntuación, determina si existe una alegación ambiental explícita o implícita suficientemente sustentada. Si NO existe, marca todos los criterios como "detectado": false y clasifica como "Sin indicios suficientes de greenwashing". Los recursos compositivos aislados (colores, tipografía, minimalismo) NO suman puntos por sí solos.
+
+1. DIMENSIÓN REPRESENTACIONAL (Significado ambiental) - Peso total: 65 puntos
+   - Participantes y elementos ambientales representados (personas, naturaleza, fauna, paisaje): 25 puntos
+   - Procesos o acciones de sostenibilidad representados (carga limpia, movilidad cero emisiones, ciclo verde): 20 puntos
+   - Representación conceptual o simbólica de naturaleza (metáforas visuales, códigos cromáticos de limpieza): 10 puntos
+   - Relación producto-naturaleza-contexto territorial (paisaje local, entorno colombiano): 10 puntos
 
 2. DIMENSIÓN COMPOSICIONAL (Estética del mensaje) - Peso total: 25 puntos
-   - Uso dominante de paletas cromáticas verdes o azules: 10 puntos
-   - Estética tecnológica minimalista (fondos limpios, iluminación fría): 10 puntos
-   - Tipografía tecnológica (sans serif, estilo corporativo limpio): 5 puntos
+   - Saliencia y jerarquía visual (punto focal, iluminación, proporción producto/naturaleza): 10 puntos
+   - Valor informativo y posicionamiento espacial (ubicación de elementos ambientales en la composición): 10 puntos
+   - Encuadre e integración-separación (relación entre producto y entorno natural): 5 puntos
 
 3. DIMENSIÓN INTERACTIVA (Relación con el espectador) - Peso total: 10 puntos
-   - Escenas emocionales (familia, bienestar, estilo de vida): 5 puntos
-   - Asociación implícita entre producto y bienestar ambiental: 5 puntos
+   - Contacto e implicación (interpelación directa, hipérbole, eufemismo ambiental): 5 puntos
+   - Distancia, perspectiva y poder (sinécdoque, omisión estratégica, construcción de autoridad ambiental): 5 puntos
 
 IMPORTANTE: Analiza cada dimensión independientemente y marca "detectado": true/false para cada criterio.
+Solo suma puntos si previamente identificaste una alegación ambiental explícita o implícita.
 La puntuación total (0-100) se calcula sumando los pesos de TODOS los criterios detectados.
 
 {
@@ -628,32 +637,32 @@ La puntuación total (0-100) se calcula sumando los pesos de TODOS los criterios
     "simplicidad_eficiencia": 50,
     "normativas": 30
   },
- "desglose_greenwashing": {
-  "dimension_semantica": {
-    "nombre": "DIMENSIÓN SEMÁNTICA (Significado ambiental)",
+"desglose_greenwashing": {
+  "dimension_representacional": {
+    "nombre": "DIMENSIÓN REPRESENTACIONAL (Significado ambiental)",
     "peso_total": 65,
     "criterios": [
-      {"criterio": "Iconografía ecológica explícita (hojas, planeta, energía limpia)", "peso": 25, "detectado": true},
-      {"criterio": "Escenarios naturales asociados a sostenibilidad", "peso": 20, "detectado": true},
-      {"criterio": "Presencia de fauna o biodiversidad", "peso": 10, "detectado": false},
-      {"criterio": "Representación de paisaje local o territorial", "peso": 10, "detectado": false}
+      {"criterio": "Participantes y elementos ambientales representados (personas, naturaleza, fauna, paisaje)", "peso": 25, "detectado": true},
+      {"criterio": "Procesos o acciones de sostenibilidad representados (carga limpia, movilidad cero emisiones, ciclo verde)", "peso": 20, "detectado": true},
+      {"criterio": "Representación conceptual o simbólica de naturaleza (metáforas visuales, códigos cromáticos de limpieza)", "peso": 10, "detectado": false},
+      {"criterio": "Relación producto-naturaleza-contexto territorial (paisaje local, entorno colombiano)", "peso": 10, "detectado": false}
     ]
   },
   "dimension_composicional": {
     "nombre": "DIMENSIÓN COMPOSICIONAL (Estética del mensaje)",
     "peso_total": 25,
     "criterios": [
-      {"criterio": "Uso dominante de paletas cromáticas verdes o azules", "peso": 10, "detectado": true},
-      {"criterio": "Estética tecnológica minimalista (fondos limpios, iluminación fría)", "peso": 10, "detectado": true},
-      {"criterio": "Tipografía tecnológica (sans serif, estilo corporativo limpio)", "peso": 5, "detectado": false}
+      {"criterio": "Saliencia y jerarquía visual (punto focal, iluminación, proporción producto/naturaleza)", "peso": 10, "detectado": true},
+      {"criterio": "Valor informativo y posicionamiento espacial (ubicación de elementos ambientales en la composición)", "peso": 10, "detectado": true},
+      {"criterio": "Encuadre e integración-separación (relación entre producto y entorno natural)", "peso": 5, "detectado": false}
     ]
   },
   "dimension_interactiva": {
     "nombre": "DIMENSIÓN INTERACTIVA (Relación con el espectador)",
     "peso_total": 10,
     "criterios": [
-      {"criterio": "Escenas emocionales (familia, bienestar, estilo de vida)", "peso": 5, "detectado": true},
-      {"criterio": "Asociación implícita entre producto y bienestar ambiental", "peso": 5, "detectado": true}
+      {"criterio": "Contacto e implicación (interpelación directa al espectador, hipérbole, eufemismo ambiental)", "peso": 5, "detectado": true},
+      {"criterio": "Distancia, perspectiva y poder (sinécdoque, omisión estratégica, construcción de autoridad ambiental)", "peso": 5, "detectado": true}
     ]
   }
 },
@@ -963,25 +972,25 @@ analysisData = JSON.parse(text);
     
     let html = '<div class="space-y-6">';
     
-    // Dimensión Semántica
-    if (breakdown.dimension_semantica) {
-        let semanticaDetected = 0;
+   // Dimensión Representacional
+    if (breakdown.dimension_representacional) {
+        let representacionalDetected = 0;
         html += `<div class="border-l-4 border-blue-500 pl-4">
-            <h4 class="font-bold text-lg mb-3">${breakdown.dimension_semantica.nombre} (${breakdown.dimension_semantica.peso_total} puntos)</h4>
+            <h4 class="font-bold text-lg mb-3">${breakdown.dimension_representacional.nombre} (${breakdown.dimension_representacional.peso_total} puntos)</h4>
             <table class="w-full"><thead><tr><th class="text-left">Criterio</th><th class="text-center w-24">Peso</th><th class="text-center w-20">Detectado</th></tr></thead><tbody>`;
         
-        breakdown.dimension_semantica.criterios.forEach(item => {
+        breakdown.dimension_representacional.criterios.forEach(item => {
             const score = item.detectado ? item.peso : 0;
-            semanticaDetected += score;
+            representacionalDetected += score;
             const checkIcon = item.detectado ? '✓' : '✗';
             const rowClass = item.detectado ? 'bg-red-50' : 'bg-green-50';
             html += `<tr class="${rowClass}"><td class="py-2">${item.criterio}</td><td class="text-center font-semibold">${item.peso}</td><td class="text-center text-xl">${checkIcon}</td></tr>`;
         });
         
         html += `</tbody></table>
-            <p class="text-right font-bold mt-2">Subtotal: ${semanticaDetected} / ${breakdown.dimension_semantica.peso_total}</p>
+            <p class="text-right font-bold mt-2">Subtotal: ${representacionalDetected} / ${breakdown.dimension_representacional.peso_total}</p>
         </div>`;
-        totalDetected += semanticaDetected;
+        totalDetected += representacionalDetected;
     }
     
     // Dimensión Composicional
@@ -1150,8 +1159,8 @@ analysisData = JSON.parse(text);
         function displayPieChart() {
             const breakdown = analysisData.desglose_greenwashing;
             let greenwashing = 0;
-            if (breakdown.dimension_semantica) {
-    greenwashing += breakdown.dimension_semantica.criterios.filter(item => item.detectado).reduce((sum, item) => sum + item.peso, 0);
+          if (breakdown.dimension_representacional) {
+    greenwashing += breakdown.dimension_representacional.criterios.filter(item => item.detectado).reduce((sum, item) => sum + item.peso, 0);
 }
 if (breakdown.dimension_composicional) {
     greenwashing += breakdown.dimension_composicional.criterios.filter(item => item.detectado).reduce((sum, item) => sum + item.peso, 0);
