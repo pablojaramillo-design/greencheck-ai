@@ -243,7 +243,7 @@ Línea 114: </style>
             <div class="card bg-yellow-50 border-2 border-yellow-300">
                 <h2 class="text-xl font-bold text-yellow-900 mb-3">¿Qué es el greenwashing?</h2>
                 <p class="text-gray-800 leading-relaxed">
-                    Greenwashing o lavado verde es una estrategia de marketing contemporánea en la que la publicidad utiliza recursos visuales asociados a la naturaleza —como entornos ecológicos, hojas, gotas de agua, ondas de mar o tipografías en tonos fríos como el verde y el azul— para construir una apariencia de sostenibilidad. Estas piezas suelen transmitir sensaciones de frescura, pureza y aire limpio, con el propósito de presentar productos como ambientalmente responsables. Sin embargo, detrás de esta estética "verde" se ocultan los verdaderos impactos ambientales derivados de la extracción de materias primas necesarias para la fabricación de tecnologías modernas de energía. En esencia, el greenwashing consiste en hacer parecer ecológico un producto que no lo es, omitiendo deliberadamente el origen y las consecuencias de los recursos utilizados en su producción.
+                    El greenwashing o lavado verde es una práctica comunicativa mediante la cual una organización, marca, producto o servicio construye o refuerza una percepción ambiental favorable que puede resultar engañosa, exagerada, ambigua, descontextualizada o insuficientemente sustentada. Esta construcción puede realizarse mediante afirmaciones explícitas o mediante la convergencia de recursos visuales y discursivos que sugieren atributos de sostenibilidad. La presencia aislada de elementos como naturaleza, colores verdes o azules, símbolos ecológicos, tecnología o referencias a la movilidad eléctrica no constituye por sí misma evidencia de greenwashing. Su identificación requiere analizar la relación entre lo que la pieza afirma o sugiere, los recursos empleados para construir ese significado, la información necesaria para contextualizarlo y la posibilidad de verificar o sustentar la alegación ambiental.
                 </p>
             </div>
 
@@ -573,6 +573,9 @@ Antes de determinar la existencia o el nivel de greenwashing, identifica si la p
 Aplica un principio de pertinencia y proporcionalidad: la ausencia de información sobre extracción de minerales, fabricación de baterías, huella de carbono, origen de la energía, reciclabilidad, ciclo de vida u otros impactos ambientales solo debe considerarse una omisión significativa cuando esa información sea materialmente necesaria para comprobar, contextualizar o delimitar una alegación ambiental efectivamente formulada por la pieza. La ausencia de dicha información no constituye por sí misma greenwashing y no debe penalizarse cuando la publicidad no realiza una promesa ambiental relacionada con ella.
 Distingue entre selección informativa inherente al formato publicitario y omisión estratégica. Una pieza publicitaria no está obligada a informar sobre todos los impactos ambientales del producto; evalúa únicamente si existe una discrepancia relevante entre lo que la publicidad afirma o sugiere ambientalmente y la evidencia que proporciona para sustentar esa afirmación. Cuanto más amplia, absoluta o general sea la promesa ambiental, mayor deberá ser la exigencia de sustento, verificabilidad y contextualización.
 Si no se identifica una alegación ambiental explícita ni una construcción ambiental implícita suficientemente sustentada, indícalo expresamente en el campo "clasificacion" usando el valor "Sin indicios suficientes de greenwashing" y explica las razones en "evaluacion_greencheck". En ese caso, no atribuyas greenwashing únicamente por tratarse de un vehículo eléctrico, por su estética tecnológica, por su paleta cromática o por la ausencia de información sobre su ciclo de vida. Si existen indicios, identifica exactamente qué elemento visual o verbal los produce, qué criterio analítico permite interpretarlo de ese modo y qué información sería pertinente para comprobar o contextualizar específicamente esa alegación.
+REGLA DE INTERPRETACIÓN CROMÁTICA: El análisis cromático tiene carácter descriptivo y composicional. La presencia o predominio de colores verdes, azules, blancos, tonos tierra u otras gamas culturalmente asociadas con naturaleza, limpieza o sostenibilidad no constituye por sí misma una alegación ambiental ni evidencia de greenwashing. El color solo podrá adquirir relevancia discursivo-ambiental cuando su uso converja con otros elementos visuales o textuales que construyan de manera identificable un significado ambiental. En ausencia de esa convergencia, limítate a describir la paleta, su temperatura, predominancia y función compositiva, sin atribuirle intención ambiental. Si el gate de pertinencia ambiental es negativo, indica en el campo de interpretación cromática que la paleta se registra exclusivamente como característica compositiva de la pieza.
+
+REGLA DE INTERPRETACIÓN: No clasificar una pieza como greenwashing por la presencia aislada de recursos visuales asociados culturalmente con sostenibilidad. Para considerar una alegación ambiental implícita debe existir convergencia contextual entre varios recursos visuales y/o discursivos que permita sustentar razonablemente dicha interpretación. Una vez identificada la alegación, evaluar su especificidad, transparencia, verificabilidad, sustento y contextualización.
 GENERA UN ÚNICO OBJETO JSON con esta estructura EXACTA (sin texto adicional, solo JSON puro):
 
 INSTRUCCIONES CRÍTICAS PARA EL CAMPO "clasificacion":
@@ -603,8 +606,8 @@ Antes de asignar cualquier puntuación, determina si existe una alegación ambie
    - Encuadre e integración-separación (relación entre producto y entorno natural): 5 puntos
 
 3. DIMENSIÓN INTERACTIVA (Relación con el espectador) - Peso total: 10 puntos
-   - Contacto e implicación (interpelación directa, hipérbole, eufemismo ambiental): 5 puntos
-   - Distancia, perspectiva y poder (sinécdoque, omisión estratégica, construcción de autoridad ambiental): 5 puntos
+ - Contacto e implicación: orientación del participante/producto, contacto visual directo o indirecto con el espectador, implicación propuesta: 5 puntos
+  - Distancia, perspectiva y relación de poder: tipo de plano, distancia social, ángulo horizontal, ángulo vertical y posición relativa del espectador: 5 puntos
 
 IMPORTANTE: Analiza cada dimensión independientemente y marca "detectado": true/false para cada criterio.
 Solo suma puntos si previamente identificaste una alegación ambiental explícita o implícita.
@@ -661,8 +664,8 @@ La puntuación total (0-100) se calcula sumando los pesos de TODOS los criterios
     "nombre": "DIMENSIÓN INTERACTIVA (Relación con el espectador)",
     "peso_total": 10,
     "criterios": [
-      {"criterio": "Contacto e implicación (interpelación directa al espectador, hipérbole, eufemismo ambiental)", "peso": 5, "detectado": true},
-      {"criterio": "Distancia, perspectiva y poder (sinécdoque, omisión estratégica, construcción de autoridad ambiental)", "peso": 5, "detectado": true}
+     {"criterio": "Contacto e implicación: orientación del participante/producto, contacto visual directo o indirecto con el espectador, implicación propuesta", "peso": 5, "detectado": true},
+      {"criterio": "Distancia, perspectiva y relación de poder: tipo de plano, distancia social, ángulo horizontal, ángulo vertical y posición relativa del espectador", "peso": 5, "detectado": true}
     ]
   }
 },
@@ -679,7 +682,9 @@ La puntuación total (0-100) se calcula sumando los pesos de TODOS los criterios
       "ahorro_energetico": false,
       "movilidad_limpia": true
     },
-    "incompletitudes_discursivas": {
+ "incompletitudes_discursivas": {
+      "gate_ambiental_activo": false,
+      "no_aplica_razon": "No se evalúan posibles omisiones sobre ciclo de vida, materias primas, energía, reciclabilidad u otros impactos ambientales, debido a que la pieza no formula una alegación ambiental explícita ni implícita que requiera dicha información para su adecuada contextualización.",
       "extraccion_minerales_criticos": false,
       "paises_origen_materiales": false,
       "impactos_socioambientales_mineria": false,
@@ -970,7 +975,47 @@ analysisData = JSON.parse(text);
     const breakdown = analysisData.desglose_greenwashing;
     let totalDetected = 0;
     
-    let html = '<div class="space-y-6">';
+function renderBloque(bloque) {
+                let bloqueHtml = `
+                    <div class="rounded-lg overflow-hidden border border-gray-200">
+                        <div class="px-4 py-3 ${bloque.headerColor}">
+                            <h4 class="font-bold text-gray-900">${bloque.titulo}</h4>
+                            <p class="text-xs text-gray-600 mt-0.5">${bloque.subtitulo}</p>
+                        </div>
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="text-left px-4 py-2 text-sm">Concepto / Dimensión</th>
+                                    <th class="text-center px-4 py-2 text-sm w-28">Detectado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                Object.keys(bloque.labels).forEach((key, i) => {
+                    const valor = bloque.data?.[key];
+                    const si = valor === true;
+                    const rowBg = i % 2 === 0 ? 'bg-white' : bloque.rowAlt;
+                    const icon = si ? '✓' : '✗';
+                    const iconColor = si ? 'text-green-600' : 'text-red-500';
+                    const texto = si ? 'Sí' : 'No';
+                    bloqueHtml += `
+                        <tr class="${rowBg}">
+                            <td class="px-4 py-2 text-sm text-gray-800">${bloque.labels[key]}</td>
+                            <td class="px-4 py-2 text-center">
+                                <span class="inline-flex items-center gap-1 font-bold text-sm ${iconColor}">
+                                    ${icon} ${texto}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
+                bloqueHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                return bloqueHtml;
+            }    let html = '<div class="space-y-6">';
     
    // Dimensión Representacional
     if (breakdown.dimension_representacional) {
@@ -1044,7 +1089,8 @@ analysisData = JSON.parse(text);
 
      function displayIncompletitudes() {
             const inc = analysisData.incompletitudes;
-
+ const gateActivo = inc.incompletitudes_discursivas?.gate_ambiental_activo;
+            const noAplica = inc.incompletitudes_discursivas?.no_aplica_razon;
             const bloques = [
                 {
                     id: 'A',
@@ -1108,7 +1154,30 @@ analysisData = JSON.parse(text);
 
             let html = '<div class="space-y-6">';
 
-            bloques.forEach(bloque => {
+ // Si el gate es negativo, mostrar NO APLICA para bloque C
+            if (!gateActivo && noAplica) {
+                const bloquesSinC = bloques.filter(b => b.id !== 'C');
+                const bloqueC = `
+                    <div class="rounded-lg overflow-hidden border border-gray-200">
+                        <div class="px-4 py-3 bg-red-200">
+                            <h4 class="font-bold text-gray-900">C. Incompletitudes discursivas</h4>
+                            <p class="text-xs text-gray-600 mt-0.5">Información estructural ausente — Van Dijk</p>
+                        </div>
+                        <div class="px-4 py-4 bg-gray-50">
+                            <p class="font-bold text-gray-700 mb-2">NO APLICA</p>
+                            <p class="text-sm text-gray-600">${noAplica}</p>
+                        </div>
+                    </div>
+                `;
+                let html = '<div class="space-y-6">';
+                bloquesSinC.forEach(bloque => {
+                    html += renderBloque(bloque);
+                });
+                html += bloqueC;
+                html += '</div>';
+                document.getElementById('incompletitudes-content').innerHTML = html;
+                return;
+            }            bloques.forEach(bloque => {
                 html += `
                     <div class="rounded-lg overflow-hidden border border-gray-200">
                         <div class="px-4 py-3 ${bloque.headerColor}">
@@ -1459,19 +1528,19 @@ if (breakdown.dimension_interactiva) {
             if (pctFrio >= 60) {
                 paletaClase = 'PALETA FRÍA';
                 paletaColor = 'text-blue-700 bg-blue-50 border-blue-400';
-                paletaDesc  = 'Predominan colores fríos (azules, verdes, violetas). En publicidad de vehículos eléctricos esta elección evoca limpieza, tecnología y naturaleza — estrategia frecuente de greenwashing visual.';
+                paletaDesc  = 'Predominan colores fríos (azules, verdes, violetas). La temperatura cromática se registra como una característica compositiva de la pieza. Por sí sola, la presencia de colores fríos no constituye una alegación ambiental ni evidencia de greenwashing.';
             } else if (pctCalido >= 60) {
                 paletaClase = 'PALETA CÁLIDA';
                 paletaColor = 'text-orange-700 bg-orange-50 border-orange-400';
-                paletaDesc  = 'Predominan colores cálidos (rojos, naranjas, amarillos). Asociados a energía, dinamismo y estatus social. Sugiere un discurso orientado al deseo y al posicionamiento más que a la sostenibilidad.';
+                paletaDesc  = 'Predominan colores cálidos (rojos, naranjas, amarillos). La temperatura cromática se registra como una característica compositiva de la pieza. Por sí sola, la presencia de colores cálidos no constituye una alegación ambiental ni evidencia de greenwashing.';
             } else if (pctNeutro >= 60) {
                 paletaClase = 'PALETA NEUTRA';
                 paletaColor = 'text-gray-700 bg-gray-50 border-gray-400';
-                paletaDesc  = 'Predominan tonos neutros (grises, blancos, negros, beige). Evoca sofisticación, minimalismo y lujo. Puede ocultar estrategias de greenwashing bajo una apariencia de discreción y elegancia.';
+                paletaDesc  = 'Predominan tonos neutros (grises, blancos, negros, beige). La temperatura cromática se registra como una característica compositiva de la pieza. Por sí sola, la presencia de tonos neutros no constituye una alegación ambiental ni evidencia de greenwashing.';
             } else {
                 paletaClase = 'PALETA MIXTA';
                 paletaColor = 'text-purple-700 bg-purple-50 border-purple-400';
-                paletaDesc  = 'Combinación equilibrada de colores fríos, cálidos y neutros. Puede indicar una estrategia multiobjetivo que mezcla discursos de estatus, libertad y sostenibilidad simultáneamente.';
+                paletaDesc  = 'Combinación de colores fríos, cálidos y neutros. La temperatura cromática se registra como una característica compositiva de la pieza. Por sí sola, esta distribución no permite inferir una alegación ambiental ni constituye evidencia de greenwashing.';
             }
 
             // Construir cuadrados de color (aprox. 19px ≈ 5mm en pantalla a 96 dpi)
