@@ -474,15 +474,14 @@ Línea 114: </style>
   "alegacion_explicita": {
     "presente": true/false,
     "texto": "cita textual exacta de la alegación si existe, o null",
-    "descripcion": "descripción precisa y acotada de la alegación sin ampliar su alcance"
+     "descripcion": "transcribe literalmente la expresión identificada como alegación. NO interpretes su alcance, condiciones de medición, ni traduzcas la expresión a afirmaciones de mayor alcance. Su evaluación corresponde a la siguiente fase."
   },
   "alegacion_implicita": {
     "presente": true/false,
     "elementos_convergentes": ["solo si hay convergencia de AL MENOS 2 categorías independientes de recursos ambientales"],
     "significado_construido": "qué significado ambiental construyen conjuntamente, o null"
   },
-  "recursos_visuales_asociados": ["elementos visuales ambientales detectados: iconografía ecológica, etiquetas energéticas, colores con función ambiental identificable, etc."],
-  "clasificacion": "SIN_ALEGACION / CARACTERISTICAS_TECNICAS / ALEGACION_IDENTIFICADA / ALEGACION_AMBIGUA",
+"recursos_visuales_asociados": ["elementos visuales que acompañan o refuerzan la alegación identificada: iconografía ecológica, etiquetas energéticas, escalas cromáticas con función ambiental identificable. NO incluir aquí la alegación verbal ya registrada en alegacion_explicita"],  "clasificacion": "SIN_ALEGACION / CARACTERISTICAS_TECNICAS / ALEGACION_IDENTIFICADA / ALEGACION_AMBIGUA",
   "decision_pertinencia": "frase breve que establece la decisión: si hay alegación identificada indicar tipo y texto; si no hay alegación explicar por qué no procede el análisis profundo"
 }
 REGLAS ESTRICTAS:
@@ -565,7 +564,7 @@ REGLAS ESTRICTAS:
                         </div>
                     </div>
 
-                    <div><h4 class="font-bold text-gray-900 mb-1">Recursos visuales ambientales asociados</h4>
+                    <div><h4 class="font-bold text-gray-900 mb-1">Recursos asociados a la alegación ambiental</h4>
                     <ul class="list-disc pl-5 text-sm text-gray-700">${(data.recursos_visuales_asociados || []).map(r => `<li>${r}</li>`).join('')}</ul></div>
 
                     <div class="border-2 ${color} rounded-lg p-4">
