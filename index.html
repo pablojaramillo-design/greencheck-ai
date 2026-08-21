@@ -579,11 +579,14 @@ REGLA DE INTERPRETACIÓN: No clasificar una pieza como greenwashing por la prese
 GENERA UN ÚNICO OBJETO JSON con esta estructura EXACTA (sin texto adicional, solo JSON puro):
 
 INSTRUCCIONES CRÍTICAS PARA EL CAMPO "clasificacion":
-Debes calcular la clasificación según la puntuación de greenwashing detectada:
+PASO 1 — Verifica primero si existe alegación ambiental explícita o implícita (gate de pertinencia).
+Si NO existe alegación ambiental: usa exactamente "Sin indicios suficientes de greenwashing" y NO calcules puntuación de greenwashing.
+Si SÍ existe alegación ambiental: calcula la puntuación sumando los pesos de criterios detectados y clasifica así:
 - Si la puntuación es 0-25: usa "Greenwashing Bajo"
 - Si la puntuación es 26-50: usa "Greenwashing Medio"
 - Si la puntuación es 51-75: usa "Greenwashing Moderado"
 - Si la puntuación es 76-100: usa "Greenwashing Alto"
+NUNCA uses "Greenwashing Alto" cuando la puntuación sea 0 o cuando no exista alegación ambiental identificada.
 
 La puntuación se calcula sumando los pesos de los criterios detectados en "desglose_greenwashing".
 IMPORTANTE: NO uses siempre "Moderado". Calcula la puntuación real y clasifica correctamente.
@@ -753,7 +756,7 @@ La puntuación total (0-100) se calcula sumando los pesos de TODOS los criterios
     "evaluacion_greencheck": "La publicidad presenta el producto como solución ambiental absoluta, utilizando narrativas de libertad y status social. Se detecta uso estratégico de colores verdes y azules.",
     "greenwashing_detectado": "Afirmación '100% Ecológico' es exageración que omite impactos de producción de baterías (litio, cobalto). Uso de colores fríos para crear halo de naturaleza sobre producto industrial.",
     "puntos_verdes": "El vehículo eléctrico es genuina alternativa a combustión interna. Reduce contaminación local en uso urbano.",
-    "clasificacion": "[CALCULA SEGÚN INSTRUCCIONES: Bajo 0-25 / Medio 26-50 / Moderado 51-75 / Alto 76-100]"
+     "clasificacion": "Sin indicios suficientes de greenwashing — la pieza no formula alegación ambiental explícita ni implícita que active el análisis de omisiones o verificabilidad. [SOLO SI HAY ALEGACIÓN: Bajo 0-25 / Medio 26-50 / Moderado 51-75 / Alto 76-100]",
     "recomendacion": "Reemplazar '100% Ecológico' por 'Cero Emisiones en Uso'. Incluir información sobre origen de baterías y reciclaje."
   }
 }`;
@@ -969,13 +972,7 @@ analysisData = JSON.parse(text);
                     }
                 }
             });
-        }
-
-        function displayBreakdown() {
-    const breakdown = analysisData.desglose_greenwashing;
-    let totalDetected = 0;
-    
-function renderBloque(bloque) {
+        }function renderBloque(bloque) {
                 let bloqueHtml = `
                     <div class="rounded-lg overflow-hidden border border-gray-200">
                         <div class="px-4 py-3 ${bloque.headerColor}">
@@ -1015,7 +1012,13 @@ function renderBloque(bloque) {
                     </div>
                 `;
                 return bloqueHtml;
-            }    let html = '<div class="space-y-6">';
+            }
+
+        function displayBreakdown() {
+    const breakdown = analysisData.desglose_greenwashing;
+    let totalDetected = 0;
+    
+
     
    // Dimensión Representacional
     if (breakdown.dimension_representacional) {
