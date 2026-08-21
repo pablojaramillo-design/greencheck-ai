@@ -226,7 +226,7 @@ Línea 114: </style>
             </div>
 
             <div class="text-center mt-8">
-                <button onclick="switchToAnalysis()" class="btn-primary text-lg px-8 py-4">
+               <button onclick="switchToDepuracion()" class="btn-primary text-lg px-8 py-4">
                     <svg class="inline w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -235,7 +235,55 @@ Línea 114: </style>
             </div>
         </div>
 
-        <!-- PANTALLA 2: ANÁLISIS -->
+         <!-- PANTALLA 2: DEPURACIÓN -->
+        <div id="depuracion-view" class="hidden">
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">Identificación y depuración analítica</h1>
+                <p class="text-sm text-gray-500">Paso previo al análisis crítico — ¿La pieza contiene una alegación ambiental?</p>
+            </header>
+
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">1. Cargar imagen de la publicidad</h3>
+                <input type="file" id="image-upload-dep" accept="image/*" class="w-full p-3 border-2 border-gray-300 rounded-lg cursor-pointer">
+                <div id="image-preview-dep-container" class="mt-4 hidden">
+                    <img id="image-preview-dep" class="max-h-64 mx-auto rounded-lg border-2 border-gray-200" alt="Vista previa">
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">2. Iniciar depuración</h3>
+                <div class="flex gap-4 mt-4">
+                    <button id="depuracion-button" onclick="startDepuracion()" disabled class="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Iniciar identificación y depuración
+                    </button>
+                    <button onclick="resetDepuracion()" class="btn-secondary flex-1">
+                        Borrar y cargar nueva imagen
+                    </button>
+                </div>
+                <div id="loading-dep" class="hidden mt-6 text-center">
+                    <div class="spinner mx-auto"></div>
+                    <p class="text-gray-600 mt-3">Analizando pieza... identificando alegaciones ambientales.</p>
+                </div>
+            </div>
+
+            <div id="depuracion-result" class="hidden">
+                <div class="card">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Resultado de la depuración</h3>
+                    <div id="depuracion-content"></div>
+                </div>
+                <div id="continuar-analisis-container" class="hidden text-center mt-4 mb-8">
+                    <p class="text-gray-700 mb-4 font-semibold">Se identificó una alegación ambiental. Puede continuar al análisis crítico riguroso.</p>
+                    <button onclick="continuarAlAnalisis()" class="btn-primary text-lg px-8 py-4">
+                        Continuar al análisis crítico →
+                    </button>
+                </div>
+            </div>
+
+            <footer class="mt-12 pt-6 border-t text-center text-sm text-gray-400">
+                Diseñado por Grupo de Investigación Socua Departamento de Diseño Universidad del Valle, Grupo de investigación en Diseño de la Universidad Pontificia Bolivariana de Medellín
+            </footer>
+        </div>
+        <!-- PANTALLA 3: ANÁLISIS CRÍTICO RIGUROSO -->
         <div id="analysis-view" class="hidden">
             <header class="text-center mb-8">
                 <h1 class="text-4xl font-bold text-gray-900 mb-2">Análisis GreenCheck</h1>
@@ -395,7 +443,131 @@ Línea 114: </style>
         let pieChart = null;
 
         // Cambio de pantalla
-        function switchToAnalysis() {
+               function switchToDepuracion() {
+            document.getElementById('landing-view').classList.add('hidden');
+            document.getElementById('depuracion-view').classList.remove('hidden');
+        }
+
+        function resetDepuracion() {
+            document.getElementById('image-upload-dep').value = '';
+            document.getElementById('image-preview-dep-container').classList.add('hidden');
+            document.getElementById('depuracion-result').classList.add('hidden');
+            document.getElementById('continuar-analisis-container').classList.add('hidden');
+            document.getElementById('depuracion-button').disabled = true;
+        }
+
+        function continuarAlAnalisis() {
+            document.getElementById('depuracion-view').classList.add('hidden');
+            document.getElementById('analysis-view').classList.remove('hidden');
+        }
+
+        async function startDepuracion() {
+            if (!base64Image) { alert('Por favor carga una imagen primero'); return; }
+            document.getElementById('loading-dep').classList.remove('hidden');
+            document.getElementById('depuracion-button').disabled = true;
+            document.getElementById('depuracion-result').classList.add('hidden');
+
+            const depPrompt = `Eres GreenCheck AI. Analiza esta pieza publicitaria de vehículo eléctrico y determina si contiene una alegación ambiental. Responde ÚNICAMENTE con este JSON puro:
+{
+  "mensaje_principal": "qué dice literalmente la publicidad",
+  "caracteristicas_tecnicas": ["lista de características técnicas detectadas"],
+  "recursos_ambientales": ["elementos ambientales visuales o verbales detectados"],
+  "alegacion_explicita": { "presente": true/false, "texto": "cita textual si existe" },
+  "alegacion_implicita": { "presente": true/false, "elementos_convergentes": ["lista"], "significado_construido": "descripción" },
+  "clasificacion": "SIN_ALEGACION / CARACTERISTICAS_TECNICAS / ALEGACION_IDENTIFICADA / ALEGACION_AMBIGUA",
+  "justificacion": "explicación breve de la clasificación",
+  "tipo_alegacion": "explicita / implicita / ninguna"
+}
+REGLA: '100% eléctrico', 'autonomía', 'batería', 'carga rápida' son características técnicas, NO alegaciones ambientales, salvo que la publicidad las vincule explícitamente con una ventaja ambiental. Para alegación implícita deben converger al menos 2 categorías independientes de recursos ambientales.`;
+
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { text: depPrompt },
+                        { inlineData: { mimeType: imageMimeType, data: base64Image } }
+                    ]
+                }]
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({...payload, generationConfig: { temperature: 0.1 }})
+                });
+                const result = await response.json();
+                let text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const firstBrace = text.indexOf('{');
+                const lastBrace = text.lastIndexOf('}');
+                text = text.substring(firstBrace, lastBrace + 1);
+                const depData = JSON.parse(text);
+                displayDepuracionResult(depData);
+            } catch (error) {
+                alert('Error en el análisis: ' + error.message);
+            } finally {
+                document.getElementById('loading-dep').classList.remove('hidden');
+                document.getElementById('loading-dep').classList.add('hidden');
+                document.getElementById('depuracion-button').disabled = false;
+            }
+        }
+
+        function displayDepuracionResult(data) {
+            document.getElementById('depuracion-result').classList.remove('hidden');
+            
+            const colores = {
+                'SIN_ALEGACION': 'bg-green-50 border-green-400',
+                'CARACTERISTICAS_TECNICAS': 'bg-blue-50 border-blue-400',
+                'ALEGACION_IDENTIFICADA': 'bg-red-50 border-red-400',
+                'ALEGACION_AMBIGUA': 'bg-yellow-50 border-yellow-400'
+            };
+            const etiquetas = {
+                'SIN_ALEGACION': 'A. Sin alegación ambiental identificable',
+                'CARACTERISTICAS_TECNICAS': 'B. Características técnicas sin alegación ambiental',
+                'ALEGACION_IDENTIFICADA': 'C. Alegación ambiental identificada',
+                'ALEGACION_AMBIGUA': 'D. Alegación ambiental ambigua'
+            };
+
+            const color = colores[data.clasificacion] || 'bg-gray-50 border-gray-400';
+            const etiqueta = etiquetas[data.clasificacion] || data.clasificacion;
+
+            let html = `
+                <div class="border-2 ${color} rounded-lg p-4 mb-4">
+                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">Clasificación preliminar</p>
+                    <p class="text-2xl font-bold mb-2">${etiqueta}</p>
+                    <p class="text-sm text-gray-700">${data.justificacion}</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div><h4 class="font-bold text-gray-900 mb-1">Mensaje principal</h4><p class="text-sm text-gray-700">${data.mensaje_principal}</p></div>
+                    
+                    <div><h4 class="font-bold text-gray-900 mb-1">Características técnicas detectadas</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.caracteristicas_tecnicas || []).map(c => `<li>${c}</li>`).join('')}</ul></div>
+                    
+                    <div><h4 class="font-bold text-gray-900 mb-1">Recursos ambientales detectados</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.recursos_ambientales || []).map(r => `<li>${r}</li>`).join('')}</ul></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border rounded-lg p-3 ${data.alegacion_explicita?.presente ? 'bg-red-50' : 'bg-green-50'}">
+                            <h4 class="font-bold text-gray-900 mb-1">Alegación explícita</h4>
+                            <p class="text-lg font-bold ${data.alegacion_explicita?.presente ? 'text-red-600' : 'text-green-600'}">${data.alegacion_explicita?.presente ? 'PRESENTE' : 'NO DETECTADA'}</p>
+                            ${data.alegacion_explicita?.texto ? `<p class="text-sm text-gray-700 mt-1 italic">"${data.alegacion_explicita.texto}"</p>` : ''}
+                        </div>
+                        <div class="border rounded-lg p-3 ${data.alegacion_implicita?.presente ? 'bg-red-50' : 'bg-green-50'}">
+                            <h4 class="font-bold text-gray-900 mb-1">Alegación implícita</h4>
+                            <p class="text-lg font-bold ${data.alegacion_implicita?.presente ? 'text-red-600' : 'text-green-600'}">${data.alegacion_implicita?.presente ? 'PRESENTE' : 'NO DETECTADA'}</p>
+                            ${data.alegacion_implicita?.significado_construido ? `<p class="text-sm text-gray-700 mt-1">${data.alegacion_implicita.significado_construido}</p>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('depuracion-content').innerHTML = html;
+
+            if (data.clasificacion === 'ALEGACION_IDENTIFICADA' || data.clasificacion === 'ALEGACION_AMBIGUA') {
+                document.getElementById('continuar-analisis-container').classList.remove('hidden');
+            }
+        } function switchToAnalysis() {
             console.log('Cambiando a análisis...');
             document.getElementById('landing-view').classList.add('hidden');
             document.getElementById('analysis-view').classList.remove('hidden');
@@ -478,7 +650,47 @@ Línea 114: </style>
                 }
             });
         });
-
+document.getElementById('image-upload-dep').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (!file.type.startsWith('image/')) {
+                        alert('Por favor seleccione un archivo de imagen');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            const maxSize = 800;
+                            if (width > maxSize || height > maxSize) {
+                                if (width > height) {
+                                    height = (height / width) * maxSize;
+                                    width = maxSize;
+                                } else {
+                                    width = (width / height) * maxSize;
+                                    height = maxSize;
+                                }
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.60);
+                            document.getElementById('image-preview-dep').src = jpegDataUrl;
+                            document.getElementById('image-preview-dep-container').classList.remove('hidden');
+                            base64Image = jpegDataUrl.split(',')[1];
+                            imageMimeType = 'image/jpeg';
+                            document.getElementById('depuracion-button').disabled = false;
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        
         // Análisis
         // Reintentar análisis manualmente
         function retryAnalysis() {
