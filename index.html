@@ -467,20 +467,30 @@ Línea 114: </style>
             document.getElementById('depuracion-button').disabled = true;
             document.getElementById('depuracion-result').classList.add('hidden');
 
-            const depPrompt = `Eres GreenCheck AI. Analiza esta pieza publicitaria de vehículo eléctrico y determina si contiene una alegación ambiental. Responde ÚNICAMENTE con este JSON puro:
+                       const depPrompt = `Eres GreenCheck AI. Analiza esta pieza publicitaria de vehículo eléctrico. Tu tarea es ÚNICAMENTE identificar si existe una alegación ambiental. No evalúes veracidad, greenwashing, omisiones ni cumplimiento normativo. Responde ÚNICAMENTE con este JSON puro:
 {
-  "mensaje_principal": "qué dice literalmente la publicidad",
-  "caracteristicas_tecnicas": ["lista de características técnicas detectadas"],
-  "recursos_ambientales": ["elementos ambientales visuales o verbales detectados"],
-  "alegacion_explicita": { "presente": true/false, "texto": "cita textual si existe" },
-  "alegacion_implicita": { "presente": true/false, "elementos_convergentes": ["lista"], "significado_construido": "descripción" },
+  "mensaje_principal": "descripción literal y objetiva de lo que dice y muestra la pieza",
+  "caracteristicas_tecnicas": ["características técnicas del producto: eléctrico, autonomía, batería, potencia, carga, etc. NO incluir aquí alegaciones ambientales"],
+  "alegacion_explicita": {
+    "presente": true/false,
+    "texto": "cita textual exacta de la alegación si existe, o null",
+    "descripcion": "descripción precisa y acotada de la alegación sin ampliar su alcance"
+  },
+  "alegacion_implicita": {
+    "presente": true/false,
+    "elementos_convergentes": ["solo si hay convergencia de AL MENOS 2 categorías independientes de recursos ambientales"],
+    "significado_construido": "qué significado ambiental construyen conjuntamente, o null"
+  },
+  "recursos_visuales_asociados": ["elementos visuales ambientales detectados: iconografía ecológica, etiquetas energéticas, colores con función ambiental identificable, etc."],
   "clasificacion": "SIN_ALEGACION / CARACTERISTICAS_TECNICAS / ALEGACION_IDENTIFICADA / ALEGACION_AMBIGUA",
-  "justificacion": "explicación breve de la clasificación",
-  "tipo_alegacion": "explicita / implicita / ninguna"
+  "decision_pertinencia": "frase breve que establece la decisión: si hay alegación identificada indicar tipo y texto; si no hay alegación explicar por qué no procede el análisis profundo"
 }
-REGLA: '100% eléctrico', 'autonomía', 'batería', 'carga rápida' son características técnicas, NO alegaciones ambientales, salvo que la publicidad las vincule explícitamente con una ventaja ambiental. Para alegación implícita deben converger al menos 2 categorías independientes de recursos ambientales.`;
-
-            const payload = {
+REGLAS ESTRICTAS:
+- '100% eléctrico', 'autonomía en km', 'batería', 'carga rápida', 'potencia' = características técnicas, NUNCA alegaciones ambientales por sí solas.
+- Una alegación explícita requiere una afirmación verbal ambiental identificable: 'cero emisiones', 'sostenible', 'ecológico', '0 g CO₂/km', 'movilidad limpia', etc.
+- Una alegación implícita requiere convergencia de AL MENOS 2 categorías independientes de recursos ambientales visuales y/o discursivos.
+- No incluyas la misma evidencia en varias categorías del JSON.
+- No evalúes si la alegación es verdadera, suficiente o engañosa. Solo identifica si existe.`; {
                 contents: [{
                     role: "user",
                     parts: [
@@ -513,7 +523,7 @@ REGLA: '100% eléctrico', 'autonomía', 'batería', 'carga rápida' son caracter
             }
         }
 
-        function displayDepuracionResult(data) {
+                function displayDepuracionResult(data) {
             document.getElementById('depuracion-result').classList.remove('hidden');
             
             const colores = {
@@ -526,48 +536,43 @@ REGLA: '100% eléctrico', 'autonomía', 'batería', 'carga rápida' son caracter
                 'SIN_ALEGACION': 'A. Sin alegación ambiental identificable',
                 'CARACTERISTICAS_TECNICAS': 'B. Características técnicas sin alegación ambiental',
                 'ALEGACION_IDENTIFICADA': 'C. Alegación ambiental identificada',
-                'ALEGACION_AMBIGUA': 'D. Alegación ambiental ambigua'
+                'ALEGACION_AMBIGUA': 'D. Alegación ambiental ambigua — requiere revisión'
             };
-
             const color = colores[data.clasificacion] || 'bg-gray-50 border-gray-400';
             const etiqueta = etiquetas[data.clasificacion] || data.clasificacion;
 
             let html = `
-                <div class="border-2 ${color} rounded-lg p-4 mb-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">Clasificación preliminar</p>
-                    <p class="text-2xl font-bold mb-2">${etiqueta}</p>
-                    <p class="text-sm text-gray-700">${data.justificacion}</p>
-                </div>
-
                 <div class="space-y-4">
-                    <div><h4 class="font-bold text-gray-900 mb-1">Mensaje principal</h4><p class="text-sm text-gray-700">${data.mensaje_principal}</p></div>
-                    
+
+                    <div><h4 class="font-bold text-gray-900 mb-1">Mensaje principal</h4>
+                    <p class="text-sm text-gray-700">${data.mensaje_principal}</p></div>
+
                     <div><h4 class="font-bold text-gray-900 mb-1">Características técnicas detectadas</h4>
                     <ul class="list-disc pl-5 text-sm text-gray-700">${(data.caracteristicas_tecnicas || []).map(c => `<li>${c}</li>`).join('')}</ul></div>
-                    
-                    <div><h4 class="font-bold text-gray-900 mb-1">Recursos ambientales detectados</h4>
-                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.recursos_ambientales || []).map(r => `<li>${r}</li>`).join('')}</ul></div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="border rounded-lg p-3 ${data.alegacion_explicita?.presente ? 'bg-red-50' : 'bg-green-50'}">
-                            <h4 class="font-bold text-gray-900 mb-1">Alegación explícita</h4>
+                        <div class="border rounded-lg p-3 ${data.alegacion_explicita?.presente ? 'bg-red-50 border-red-300' : 'bg-green-50 border-green-300'}">
+                            <h4 class="font-bold text-gray-900 mb-1">Alegación ambiental explícita</h4>
                             <p class="text-lg font-bold ${data.alegacion_explicita?.presente ? 'text-red-600' : 'text-green-600'}">${data.alegacion_explicita?.presente ? 'PRESENTE' : 'NO DETECTADA'}</p>
                             ${data.alegacion_explicita?.texto ? `<p class="text-sm text-gray-700 mt-1 italic">"${data.alegacion_explicita.texto}"</p>` : ''}
+                            ${data.alegacion_explicita?.descripcion ? `<p class="text-sm text-gray-600 mt-1">${data.alegacion_explicita.descripcion}</p>` : ''}
                         </div>
-                        <div class="border rounded-lg p-3 ${data.alegacion_implicita?.presente ? 'bg-red-50' : 'bg-green-50'}">
-                            <h4 class="font-bold text-gray-900 mb-1">Alegación implícita</h4>
+                        <div class="border rounded-lg p-3 ${data.alegacion_implicita?.presente ? 'bg-red-50 border-red-300' : 'bg-green-50 border-green-300'}">
+                            <h4 class="font-bold text-gray-900 mb-1">Alegación ambiental implícita</h4>
                             <p class="text-lg font-bold ${data.alegacion_implicita?.presente ? 'text-red-600' : 'text-green-600'}">${data.alegacion_implicita?.presente ? 'PRESENTE' : 'NO DETECTADA'}</p>
-                            ${data.alegacion_implicita?.significado_construido ? `<p class="text-sm text-gray-700 mt-1">${data.alegacion_implicita.significado_construido}</p>` : ''}
+                            ${data.alegacion_implicita?.elementos_convergentes?.length ? `<ul class="list-disc pl-4 text-sm text-gray-700 mt-1">${data.alegacion_implicita.elementos_convergentes.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
+                            ${data.alegacion_implicita?.significado_construido ? `<p class="text-sm text-gray-600 mt-1">${data.alegacion_implicita.significado_construido}</p>` : ''}
                         </div>
                     </div>
-                </div>
-            `;
-            document.getElementById('depuracion-content').innerHTML = html;
 
-            if (data.clasificacion === 'ALEGACION_IDENTIFICADA' || data.clasificacion === 'ALEGACION_AMBIGUA') {
-                document.getElementById('continuar-analisis-container').classList.remove('hidden');
-            }
-        } function switchToAnalysis() {
+                    <div><h4 class="font-bold text-gray-900 mb-1">Recursos visuales ambientales asociados</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.recursos_visuales_asociados || []).map(r => `<li>${r}</li>`).join('')}</ul></div>
+
+                    <div class="border-2 ${color} rounded-lg p-4">
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">Clasificación preliminar</p>
+                        <p class="text-xl font-bold mb-2">${etiqueta}</p>
+                        <p class="text-sm text-gray-700 mb-3">${data.decision_pertinencia}</p>
+                        ${data.clasificacion === 'ALEGACION_IDENTIFICADA' || data.clasificacion === 'ALEGACION_AMBIGUA' ? } function switchToAnalysis() {
             console.log('Cambiando a análisis...');
             document.getElementById('landing-view').classList.add('hidden');
             document.getElementById('analysis-view').classList.remove('hidden');
