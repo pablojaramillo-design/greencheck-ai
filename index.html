@@ -780,7 +780,7 @@ RESPONDE SOLO CON JSON, SIN TEXTO ADICIONAL.` },
             };
 
             // Función de llamada a API con reintentos automáticos
-            async function callGeminiAPI(payload, intentoActual = 1, maxIntentos = 3) {
+            async function callGeminiAPI(payload, intentoActual = 1, maxIntentos = 5) {
                 const loadingMsg = document.getElementById('loading-msg');
                 if (loadingMsg) {
                     loadingMsg.textContent = intentoActual > 1 
@@ -796,7 +796,7 @@ RESPONDE SOLO CON JSON, SIN TEXTO ADICIONAL.` },
 
                 // Si es 503 o 429 y aún hay intentos, esperar y reintentar
                 if ((response.status === 503 || response.status === 429) && intentoActual < maxIntentos) {
-                    const espera = intentoActual * 4000; // 4s, 8s
+                    const espera = intentoActual * 8000; // 8s, 16s
                     if (loadingMsg) loadingMsg.textContent = `Servidor ocupado. Reintentando en ${espera/1000} segundos... (${intentoActual}/${maxIntentos})`;
                     await new Promise(resolve => setTimeout(resolve, espera));
                     return callGeminiAPI(payload, intentoActual + 1, maxIntentos);
