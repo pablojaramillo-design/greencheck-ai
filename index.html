@@ -481,7 +481,14 @@ Línea 114: </style>
     "elementos_convergentes": ["solo si hay convergencia de AL MENOS 2 categorías independientes de recursos ambientales"],
     "significado_construido": "qué significado ambiental construyen conjuntamente, o null"
   },
-"recursos_visuales_asociados": ["elementos visuales que acompañan o refuerzan la alegación identificada: iconografía ecológica, etiquetas energéticas, escalas cromáticas con función ambiental identificable. NO incluir aquí la alegación verbal ya registrada en alegacion_explicita"],  "clasificacion": "SIN_ALEGACION / CARACTERISTICAS_TECNICAS / ALEGACION_IDENTIFICADA / ALEGACION_AMBIGUA",
+"recursos_visuales_asociados": ["elementos visuales que acompañan o refuerzan la alegación identificada: iconografía ecológica, etiquetas energéticas, escalas cromáticas con función ambiental identificable. NO incluir aquí la alegación verbal ya registrada en alegacion_explicita"],
+  "afirmaciones_tecnicas_verificables": [
+    {
+      "afirmacion": "transcripción literal de la cifra o dato cuantificable",
+      "sustento_declarado": "fuente, estándar, protocolo o método indicado en la pieza, o 'No identificado en la pieza'"
+    }
+  ],
+  "clasificacion": "SIN_ALEGACION / CARACTERISTICAS_TECNICAS / ALEGACION_IDENTIFICADA / ALEGACION_AMBIGUA",
   "decision_pertinencia": "frase breve que establece la decisión: si hay alegación identificada indicar tipo y texto; si no hay alegación explicar por qué no procede el análisis profundo"
 }
 REGLAS ESTRICTAS:
@@ -493,7 +500,8 @@ REGLAS ESTRICTAS:
   NIVEL 3 - ALEGACIÓN AMBIENTAL IMPLÍCITA: requiere convergencia de AL MENOS 2 categorías independientes + anclaje explícito entre producto y naturaleza + atribución identificable de un beneficio ambiental al producto. Ejemplos: hojas que emergen del vehículo, producto fusionado visualmente con ecosistema, mensaje verbal que vincula el producto con protección ambiental.
 - La presencia de un vehículo en un paisaje natural es AMBIENTACIÓN, no alegación implícita.
 - No incluyas la misma evidencia en varias categorías del JSON.
-- No evalúes si la alegación es verdadera, suficiente o engañosa. Solo identifica si existe.`;
+- No evalúes si la alegación es verdadera, suficiente o engañosa. Solo identifica si existe.
+- AFIRMACIONES TÉCNICAS VERIFICABLES: cuando la pieza presente cifras cuantificables de desempeño —autonomía, consumo, tiempo de carga, capacidad de batería, potencia, eficiencia o emisiones— regístralas en "afirmaciones_tecnicas_verificables". Indica literalmente la afirmación y determina únicamente si la propia pieza declara una fuente, estándar, certificación, protocolo o método de medición. Si no aparece, indica "No identificado en la pieza". No presumas qué estándar debería utilizarse y no consideres su ausencia como alegación ambiental o indicio de greenwashing.`;
             const payload = {
                 contents: [{
                     role: "user",
@@ -571,6 +579,17 @@ REGLAS ESTRICTAS:
 
                     <div><h4 class="font-bold text-gray-900 mb-1">Recursos asociados a la alegación ambiental</h4>
                     <ul class="list-disc pl-5 text-sm text-gray-700">${(data.recursos_visuales_asociados || []).map(r => `<li>${r}</li>`).join('')}</ul></div>
+                    ${data.afirmaciones_tecnicas_verificables && data.afirmaciones_tecnicas_verificables.length > 0 ? `
+                    <div class="border-l-4 border-blue-400 pl-4 py-3 bg-blue-50 rounded-r-lg">
+                        <h4 class="font-bold text-gray-900 mb-2">Afirmaciones técnicas verificables</h4>
+                        ${data.afirmaciones_tecnicas_verificables.map(atv => `
+                            <div class="mb-3">
+                                <p class="text-sm font-semibold text-gray-800 italic">"${atv.afirmacion}"</p>
+                                <p class="text-xs text-gray-600 mt-1"><span class="font-semibold">Sustento declarado en la pieza:</span> ${atv.sustento_declarado}</p>
+                                <p class="text-xs text-gray-500 mt-1 italic">Esta ausencia se registra con fines de trazabilidad informativa y no constituye por sí misma una alegación ambiental ni un indicio de greenwashing.</p>
+                            </div>
+                        `).join('')}
+                    </div>` : ''}
 
                     <div class="border-2 ${color} rounded-lg p-4">
                         <p class="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">Clasificación preliminar</p>
