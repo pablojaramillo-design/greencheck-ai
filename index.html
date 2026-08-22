@@ -487,7 +487,11 @@ Línea 114: </style>
 REGLAS ESTRICTAS:
 - '100% eléctrico', 'autonomía en km', 'batería', 'carga rápida', 'potencia' = características técnicas, NUNCA alegaciones ambientales por sí solas.
 - Una alegación explícita requiere una afirmación verbal ambiental identificable: 'cero emisiones', 'sostenible', 'ecológico', '0 g CO₂/km', 'movilidad limpia', etc.
-- Una alegación implícita requiere convergencia de AL MENOS 2 categorías independientes de recursos ambientales visuales y/o discursivos.
+- TRES NIVELES para recursos visuales ambientales:
+  NIVEL 1 - AMBIENTACIÓN: paisaje, desierto, cielo, vegetación de fondo, iluminación natural, entorno escénico. NO constituye alegación ambiental. El vehículo simplemente está fotografiado en ese entorno.
+  NIVEL 2 - ASOCIACIÓN AMBIENTAL POTENCIAL: varios recursos ambientales presentes pero sin atribución clara de beneficio ambiental al producto. Clasificar como ALEGACION_AMBIGUA.
+  NIVEL 3 - ALEGACIÓN AMBIENTAL IMPLÍCITA: requiere convergencia de AL MENOS 2 categorías independientes + anclaje explícito entre producto y naturaleza + atribución identificable de un beneficio ambiental al producto. Ejemplos: hojas que emergen del vehículo, producto fusionado visualmente con ecosistema, mensaje verbal que vincula el producto con protección ambiental.
+- La presencia de un vehículo en un paisaje natural es AMBIENTACIÓN, no alegación implícita.
 - No incluyas la misma evidencia en varias categorías del JSON.
 - No evalúes si la alegación es verdadera, suficiente o engañosa. Solo identifica si existe.`;
             const payload = {
