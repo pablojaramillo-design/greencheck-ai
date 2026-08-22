@@ -560,6 +560,17 @@ REGLAS ESTRICTAS:
 
                     <div><h4 class="font-bold text-gray-900 mb-1">Características técnicas detectadas</h4>
                     <ul class="list-disc pl-5 text-sm text-gray-700">${(data.caracteristicas_tecnicas || []).map(c => `<li>${c}</li>`).join('')}</ul></div>
+                                        ${data.afirmaciones_tecnicas_verificables && data.afirmaciones_tecnicas_verificables.length > 0 ? `
+                    <div class="border-l-4 border-blue-400 pl-4 py-3 bg-blue-50 rounded-r-lg mt-3">
+                        <h4 class="font-bold text-gray-900 mb-2">Afirmaciones técnicas verificables</h4>
+                        ${data.afirmaciones_tecnicas_verificables.map(atv => `
+                            <div class="mb-3">
+                                <p class="text-sm font-semibold text-gray-800 italic">"${atv.afirmacion}"</p>
+                                <p class="text-xs text-gray-600 mt-1"><span class="font-semibold">Sustento declarado en la pieza:</span> ${atv.sustento_declarado}</p>
+                                <p class="text-xs text-gray-500 mt-1 italic">Esta observación corresponde a la verificabilidad de la información técnica y no constituye por sí misma una alegación ambiental ni un indicio de greenwashing.</p>
+                            </div>
+                        `).join('')}
+                    </div>` : ''}
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="border rounded-lg p-3 ${data.alegacion_explicita?.presente ? 'bg-red-50 border-red-300' : 'bg-green-50 border-green-300'}">
@@ -576,19 +587,10 @@ REGLAS ESTRICTAS:
                         </div>
                     </div>
 
+                    ${(data.alegacion_explicita?.presente || data.alegacion_implicita?.presente) ? `
                     <div><h4 class="font-bold text-gray-900 mb-1">Recursos asociados a la alegación ambiental</h4>
-                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.recursos_visuales_asociados || []).map(r => `<li>${r}</li>`).join('')}</ul></div>
-                    ${data.afirmaciones_tecnicas_verificables && data.afirmaciones_tecnicas_verificables.length > 0 ? `
-                    <div class="border-l-4 border-blue-400 pl-4 py-3 bg-blue-50 rounded-r-lg">
-                        <h4 class="font-bold text-gray-900 mb-2">Afirmaciones técnicas verificables</h4>
-                        ${data.afirmaciones_tecnicas_verificables.map(atv => `
-                            <div class="mb-3">
-                                <p class="text-sm font-semibold text-gray-800 italic">"${atv.afirmacion}"</p>
-                                <p class="text-xs text-gray-600 mt-1"><span class="font-semibold">Sustento declarado en la pieza:</span> ${atv.sustento_declarado}</p>
-                                <p class="text-xs text-gray-500 mt-1 italic">Esta ausencia se registra con fines de trazabilidad informativa y no constituye por sí misma una alegación ambiental ni un indicio de greenwashing.</p>
-                            </div>
-                        `).join('')}
-                    </div>` : ''}
+                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.recursos_visuales_asociados || []).map(r => `<li>${r}</li>`).join('')}</ul></div>` : ''}
+                    
 
                     <div class="border-2 ${color} rounded-lg p-4">
                         <p class="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">Clasificación preliminar</p>
