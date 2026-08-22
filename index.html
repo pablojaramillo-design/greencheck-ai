@@ -469,12 +469,12 @@ Línea 114: </style>
 
                        const depPrompt = `Eres GreenCheck AI. Analiza esta pieza publicitaria de vehículo eléctrico. Tu tarea es ÚNICAMENTE identificar si existe una alegación ambiental. No evalúes veracidad, greenwashing, omisiones ni cumplimiento normativo. Responde ÚNICAMENTE con este JSON puro:
 {
-  "mensaje_principal": "descripción literal y objetiva de lo que dice y muestra la pieza",
+  "mensaje_principal": "resumen conciso del mensaje central de la pieza: marca, modelo, características comunicadas y datos relevantes para la decisión de pertinencia. Máximo 2-3 líneas. No describir elementos visuales irrelevantes como escenografía, interfaz de red social o contexto de publicación.",
   "caracteristicas_tecnicas": ["características técnicas del producto: eléctrico, autonomía, batería, potencia, carga, etc. NO incluir aquí alegaciones ambientales"],
   "alegacion_explicita": {
     "presente": true/false,
     "texto": "cita textual exacta de la alegación si existe, o null",
-     "descripcion": "transcribe literalmente la expresión identificada como alegación. NO interpretes su alcance, condiciones de medición, ni traduzcas la expresión a afirmaciones de mayor alcance. Su evaluación corresponde a la siguiente fase."
+     "descripcion": "transcribe literalmente la expresión identificada como alegación, sin interpretarla ni ampliar su alcance. Si hay duplicados de la misma alegación, conserva únicamente la expresión literal más completa presente en la pieza.",
   },
   "alegacion_implicita": {
     "presente": true/false,
