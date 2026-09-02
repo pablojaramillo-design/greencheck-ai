@@ -544,6 +544,7 @@ REGLAS NEGATIVAS — NO inferir declaración ambiental únicamente por: vehícul
                 });
                 const result = await response.json();
                 let text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                            if (!text) throw new Error('La IA no devolvió contenido. Intente nuevamente.');
                 text = text.replace(/```json/g, '').replace(/```/g, '').trim();
                 const firstBrace = text.indexOf('{');
                 const lastBrace = text.lastIndexOf('}');
