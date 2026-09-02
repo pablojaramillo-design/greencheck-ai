@@ -467,40 +467,65 @@ Línea 114: </style>
             document.getElementById('depuracion-button').disabled = true;
             document.getElementById('depuracion-result').classList.add('hidden');
 
-                       const depPrompt = `Eres GreenCheck AI. Analiza esta pieza publicitaria de vehículo eléctrico. Tu tarea es ÚNICAMENTE identificar si existe una alegación ambiental. No evalúes veracidad, greenwashing, omisiones ni cumplimiento normativo. Responde ÚNICAMENTE con este JSON puro:
+            const depPrompt = `Eres GreenCheck AI. Analiza esta pieza publicitaria de vehículo eléctrico aplicando la matriz de determinantes observacionales. Tu tarea es ÚNICAMENTE identificar y codificar los determinantes, asignar una tipología y determinar si existe una declaración ambiental. No evalúes veracidad, greenwashing, omisiones ni cumplimiento normativo. Responde ÚNICAMENTE con este JSON puro:
 {
-  "mensaje_principal": "resumen conciso del mensaje central de la pieza: marca, modelo, características comunicadas y datos relevantes para la decisión de pertinencia. Máximo 2-3 líneas. No describir elementos visuales irrelevantes como escenografía, interfaz de red social o contexto de publicación.",
-  "caracteristicas_tecnicas": ["características técnicas del producto: eléctrico, autonomía, batería, potencia, carga, etc. NO incluir aquí alegaciones ambientales"],
-  "alegacion_explicita": {
-    "presente": true/false,
-    "texto": "cita textual exacta de la alegación si existe, o null",
-     "descripcion": "transcribe literalmente la expresión identificada como alegación, sin interpretarla ni ampliar su alcance. Si hay duplicados de la misma alegación, conserva únicamente la expresión literal más completa presente en la pieza.",
+  "mensaje_principal": "resumen conciso del mensaje central: marca, modelo, características comunicadas. Máximo 2-3 líneas.",
+  "determinantes": {
+    "D1_configuracion_producto": "COMPLETO / PARCIAL_DETALLE / AUSENTE",
+    "D2_contexto_representacional": "SIN_CONTEXTO / VIAL / URBANO / ARQUITECTONICO / TECNOLOGICO / NATURAL / NATURAL_CONSTRUIDO / OTRO",
+    "D3_componente_verbal": "AUSENTE / COMERCIAL / CULTURAL / TECNICA / AMBIENTAL_EXPLICITA / MIXTA",
+    "D4_recursos_ambientales_visuales": "AUSENTES / AISLADOS / CONVERGENTES",
+    "D4_descripcion": "descripción breve de los recursos ambientales visuales detectados, o null",
+    "D5_relacion_producto_entorno": "NINGUNA / COEXISTENCIA / ASOCIACION / INTEGRACION / TRANSFORMACION",
+    "D6_afirmacion_tecnica_verificable": "AUSENTE / PRESENTE_SIN_SUSTENTO / PRESENTE_CON_SUSTENTO",
+    "D6_detalle": [{"afirmacion": "texto literal", "sustento_declarado": "fuente o No identificado en la pieza"}],
+    "D7_anclaje_ambiental": "AUSENTE / AMBIGUO / IDENTIFICABLE",
+    "D7_justificacion": "explicación de por qué se asignó ese valor a D7",
+    "D8_asociacion_cultural": ["AC_ESTATUS / AC_PROGRESO / AC_INNOVACION / AC_LIBERTAD / AC_AVENTURA / AC_PERTENENCIA / AC_BIENESTAR / AC_TERRITORIO / AC_PATRIMONIO / AC_PAISAJE_CULTURAL / AC_VESTIMENTA / AC_LENGUAJE / AC_PRACTICA / AC_SIMBOLO / AC_OTRA"],
+    "D8_confianza": "ALTA / MEDIA / BAJA / NO_APLICA",
+    "D8_evidencia": "descripción de los elementos culturales detectados, o null"
   },
-  "alegacion_implicita": {
-    "presente": true/false,
-    "elementos_convergentes": ["solo si hay convergencia de AL MENOS 2 categorías independientes de recursos ambientales"],
+  "caracteristicas_tecnicas": ["lista de características técnicas: eléctrico, autonomía, batería, potencia, carga. NO incluir declaraciones ambientales"],
+  "declaracion_explicita": {
+    "presente": true,
+    "texto": "cita textual exacta o null",
+    "descripcion": "transcripción literal sin interpretar su alcance"
+  },
+  "declaracion_implicita": {
+    "presente": false,
+    "elementos_convergentes": ["solo si hay convergencia de AL MENOS 2 categorías independientes"],
     "significado_construido": "qué significado ambiental construyen conjuntamente, o null"
   },
-"recursos_visuales_asociados": ["elementos visuales que acompañan o refuerzan la alegación identificada: iconografía ecológica, etiquetas energéticas, escalas cromáticas con función ambiental identificable. NO incluir aquí la alegación verbal ya registrada en alegacion_explicita"],
-  "afirmaciones_tecnicas_verificables": [
-    {
-      "afirmacion": "transcripción literal de la cifra o dato cuantificable",
-      "sustento_declarado": "fuente, estándar, protocolo o método indicado en la pieza, o 'No identificado en la pieza'"
-    }
-  ],
-  "clasificacion": "SIN_ALEGACION / CARACTERISTICAS_TECNICAS / ALEGACION_IDENTIFICADA / ALEGACION_AMBIGUA",
-"decision_pertinencia": "si hay alegación ambiental: indicar tipo y texto. Si no hay alegación: indicar que no procede el análisis crítico de greenwashing. Si hay afirmaciones técnicas verificables sin sustento declarado: añadir 'Se registra una afirmación técnica cuantificable cuya fuente o método de medición no se encuentra declarado en la pieza. Esta observación corresponde a verificabilidad de información técnica y no constituye por sí misma un indicio de greenwashing.'"}
-REGLAS ESTRICTAS:
-- '100% eléctrico', 'autonomía en km', 'batería', 'carga rápida', 'potencia' = características técnicas, NUNCA alegaciones ambientales por sí solas.
-- Una alegación explícita requiere una afirmación verbal ambiental identificable: 'cero emisiones', 'sostenible', 'ecológico', '0 g CO₂/km', 'movilidad limpia', etc.
-- TRES NIVELES para recursos visuales ambientales:
-  NIVEL 1 - AMBIENTACIÓN: paisaje, desierto, cielo, vegetación de fondo, iluminación natural, entorno escénico. NO constituye alegación ambiental. El vehículo simplemente está fotografiado en ese entorno.
-  NIVEL 2 - ASOCIACIÓN AMBIENTAL POTENCIAL: varios recursos ambientales presentes pero sin atribución clara de beneficio ambiental al producto. Clasificar como ALEGACION_AMBIGUA.
-  NIVEL 3 - ALEGACIÓN AMBIENTAL IMPLÍCITA: requiere convergencia de AL MENOS 2 categorías independientes + anclaje explícito entre producto y naturaleza + atribución identificable de un beneficio ambiental al producto. Ejemplos: hojas que emergen del vehículo, producto fusionado visualmente con ecosistema, mensaje verbal que vincula el producto con protección ambiental.
-- La presencia de un vehículo en un paisaje natural es AMBIENTACIÓN, no alegación implícita.
-- No incluyas la misma evidencia en varias categorías del JSON.
-- No evalúes si la alegación es verdadera, suficiente o engañosa. Solo identifica si existe.
-- AFIRMACIONES TÉCNICAS VERIFICABLES: cuando la pieza presente cifras cuantificables de desempeño —autonomía, consumo, tiempo de carga, capacidad de batería, potencia, eficiencia o emisiones— regístralas en "afirmaciones_tecnicas_verificables". Indica literalmente la afirmación y determina únicamente si la propia pieza declara una fuente, estándar, certificación, protocolo o método de medición. Si no aparece, indica "No identificado en la pieza". No presumas qué estándar debería utilizarse y no consideres su ausencia como alegación ambiental o indicio de greenwashing.`;
+  "recursos_visuales_asociados": ["elementos que acompañan o refuerzan la declaración identificada"],
+  "tipologia": "T1 / T2 / T3 / T4 / T5 / T6 / T7 / T8 / T9 / T10 / T11",
+  "tipologia_nombre": "nombre completo de la tipología",
+  "tipologia_justificacion": "explicación de por qué se asignó esta tipología basada en los determinantes",
+  "clasificacion": "SIN_DECLARACION / CARACTERISTICAS_TECNICAS / DECLARACION_IDENTIFICADA / DECLARACION_AMBIGUA",
+  "decision_pertinencia": "explicación de la decisión: si hay declaración indicar tipo; si no hay indicar por qué no procede el análisis riguroso; si hay ATV sin sustento añadir nota de trazabilidad"
+}
+DETERMINANTES — REGLAS ESTRICTAS DE CODIFICACIÓN:
+D1: COMPLETO=vehículo reconocible y predominante. PARCIAL_DETALLE=componente focalizado (puerto carga, faro, batería). AUSENTE=no aparece visualmente.
+D2: NATURAL=paisaje como escenario fotográfico. NATURAL_CONSTRUIDO=composición diseñada donde naturaleza y producto forman unidad deliberada. NATURAL ≠ declaración ambiental por sí solo.
+D3: TECNICA incluye '100% eléctrico', autonomía, batería, potencia. AMBIENTAL_EXPLICITA incluye 'cero emisiones', 'ecológico', 'sostenible', 'movilidad limpia', '0 g CO₂/km'. '100% eléctrico' NO equivale automáticamente a 'sostenible'.
+D4: AISLADOS=un único elemento potencialmente ambiental sin relación suficiente. CONVERGENTES=varios elementos construyen conjuntamente un significado ambiental. Color verde, azul, paleta fría, cielo, vegetación NO constituyen por sí solos evidencia ambiental.
+D5: COEXISTENCIA=vehículo en naturaleza como escenario. ASOCIACION=composición aproxima vehículo y naturaleza conceptualmente. INTEGRACION=forman unidad visual. TRANSFORMACION=producto como causa de cambio ambiental. Solo ASOCIACION/INTEGRACION/TRANSFORMACION pueden contribuir a declaración implícita.
+D6: Solo incluir datos pertinentes para GreenCheck: autonomía, emisiones, consumo, eficiencia, batería, carga cuando sea ambientalmente pertinente. PRESENTE_SIN_SUSTENTO ≠ greenwashing. Es dato de trazabilidad.
+D7: AUSENTE=no puede identificarse qué cualidad ambiental se atribuye al producto. AMBIGUO=indicios insuficientes para atribución clara. IDENTIFICABLE=puede explicarse concretamente qué recursos convergen + qué relación establecen + qué cualidad ambiental atribuyen. Declaración implícita = evidencia + relación + atribución. Si falta cualquiera → NO clasificar como declaración implícita.
+D8: Selección múltiple permitida. AC_TERRITORIO/AC_PATRIMONIO/AC_PAISAJE_CULTURAL: identificar hitos colombianos reconocibles (murallas Cartagena, monumento Belalcázar Cali, paisaje cafetero). No inferir localización solo porque arquitectura 'parezca colombiana'. AC_VESTIMENTA: registrar indumentaria representada como tradicional sin inferir identidad étnica. AC_LENGUAJE: identificar expresiones culturalmente situadas ('parce', 'chimba', 'paisano') atendiendo al contexto de uso.
+TIPOLOGÍAS — ASIGNAR LA DE MAYOR JERARQUÍA (menor número = mayor prioridad):
+T1=Representación aislada: D2=SIN_CONTEXTO, D4=AUSENTES, D7=AUSENTE → NO pasa
+T2=Representación contextual neutra: D2=URBANO/VIAL/ARQUITECTONICO/TECNOLOGICO, D4=AUSENTES, D7=AUSENTE → NO pasa
+T3=Ambientación natural: D2=NATURAL, D4=AUSENTES o AISLADOS, D5=COEXISTENCIA, D7=AUSENTE → NO pasa
+T4=Representación tecnocéntrica: D1=PARCIAL_DETALLE, D3=TECNICA, D4=AUSENTES, D7=AUSENTE → NO pasa
+T5=Declaración ambiental explícita: D3=AMBIENTAL_EXPLICITA o MIXTA, D7=IDENTIFICABLE → SÍ pasa
+T6=Declaración ambiental implícita simbólica: D4=CONVERGENTES, D5=ASOCIACION, D7=IDENTIFICABLE → SÍ pasa
+T7=Declaración ambiental implícita representacional: D2=NATURAL_CONSTRUIDO, D4=CONVERGENTES, D5=INTEGRACION o TRANSFORMACION, D7=IDENTIFICABLE → SÍ pasa
+T8=Declaración ambiental multimodal: D3=AMBIENTAL_EXPLICITA, D4=CONVERGENTES, D5≥ASOCIACION, D7=IDENTIFICABLE → SÍ pasa (PRIORIDAD MÁS ALTA)
+T9=Declaración ambiental técnica cuantificada: D3=AMBIENTAL_EXPLICITA, D6=PRESENTE, D7=IDENTIFICABLE → SÍ pasa
+T10=Asociación ambiental ambigua: D4=AISLADOS, D7=AMBIGUO → REVISIÓN investigador
+T11=Información técnica verificable sin declaración: D3=TECNICA, D4=AUSENTES, D6=PRESENTE, D7=AUSENTE → NO pasa
+JERARQUÍA si coinciden varias tipologías: T8 > T9 > T7 > T5 > T6 > T10 > T11 > T4 > T3 > T2 > T1
+REGLAS NEGATIVAS — NO inferir declaración ambiental únicamente por: vehículo eléctrico, cargador, batería, color verde, color azul, paleta fría, iluminación limpia, minimalismo, paisaje natural, vegetación, cielo, agua, carretera, arquitectura futurista, tecnología, ausencia de humo, autonomía, beneficios como sin pico y placa, incentivos gubernamentales.`;
             const payload = {
                 contents: [{
                     role: "user",
@@ -534,77 +559,166 @@ REGLAS ESTRICTAS:
             }
         }
 
-                function displayDepuracionResult(data) {
+function displayDepuracionResult(data) {
             document.getElementById('depuracion-result').classList.remove('hidden');
-            
+
+            // Mapeo de clasificaciones a colores y etiquetas
             const colores = {
+                'SIN_DECLARACION': 'bg-green-50 border-green-400',
                 'SIN_ALEGACION': 'bg-green-50 border-green-400',
                 'CARACTERISTICAS_TECNICAS': 'bg-blue-50 border-blue-400',
+                'DECLARACION_IDENTIFICADA': 'bg-red-50 border-red-400',
                 'ALEGACION_IDENTIFICADA': 'bg-red-50 border-red-400',
+                'DECLARACION_AMBIGUA': 'bg-yellow-50 border-yellow-400',
                 'ALEGACION_AMBIGUA': 'bg-yellow-50 border-yellow-400'
             };
             const etiquetas = {
-                'SIN_ALEGACION': 'A. Sin alegación ambiental identificable',
-                'CARACTERISTICAS_TECNICAS': 'B. Características técnicas sin alegación ambiental',
-                'ALEGACION_IDENTIFICADA': 'C. Alegación ambiental identificada',
-                'ALEGACION_AMBIGUA': 'D. Alegación ambiental ambigua — requiere revisión'
+                'SIN_DECLARACION': 'A. Sin declaración ambiental identificable',
+                'SIN_ALEGACION': 'A. Sin declaración ambiental identificable',
+                'CARACTERISTICAS_TECNICAS': 'B. Características técnicas sin declaración ambiental',
+                'DECLARACION_IDENTIFICADA': 'C. Declaración ambiental identificada',
+                'ALEGACION_IDENTIFICADA': 'C. Declaración ambiental identificada',
+                'DECLARACION_AMBIGUA': 'D. Declaración ambiental ambigua — requiere revisión',
+                'ALEGACION_AMBIGUA': 'D. Declaración ambiental ambigua — requiere revisión'
             };
+
             const color = colores[data.clasificacion] || 'bg-gray-50 border-gray-400';
             const etiqueta = etiquetas[data.clasificacion] || data.clasificacion;
+            const det = data.determinantes || {};
 
-            let html = `
-                <div class="space-y-4">
+            // Colores por valor de determinante
+            const colorD7 = { 'AUSENTE': 'text-green-600', 'AMBIGUO': 'text-yellow-600', 'IDENTIFICABLE': 'text-red-600' };
+            const colorD3 = { 'AMBIENTAL_EXPLICITA': 'text-red-600', 'MIXTA': 'text-orange-600', 'TECNICA': 'text-blue-600', 'AUSENTE': 'text-gray-400', 'COMERCIAL': 'text-gray-500', 'CULTURAL': 'text-purple-500' };
+            const colorD4 = { 'AUSENTES': 'text-green-600', 'AISLADOS': 'text-yellow-600', 'CONVERGENTES': 'text-red-600' };
+            const colorD5 = { 'NINGUNA': 'text-green-600', 'COEXISTENCIA': 'text-blue-500', 'ASOCIACION': 'text-orange-500', 'INTEGRACION': 'text-red-500', 'TRANSFORMACION': 'text-red-700' };
 
+            // Tipología y si activa análisis
+            const tipActiva = ['T5','T6','T7','T8','T9'].includes(data.tipologia);
+            const tipRevision = data.tipologia === 'T10';
+            const tipColor = tipActiva ? 'bg-red-100 border-red-400 text-red-800' : tipRevision ? 'bg-yellow-100 border-yellow-400 text-yellow-800' : 'bg-green-100 border-green-400 text-green-800';
+            const tipDecision = tipActiva ? 'SÍ — activa análisis crítico riguroso' : tipRevision ? 'REVISIÓN del investigador' : 'NO — no activa análisis riguroso';
+
+            let html = `<div class="space-y-5">
+
+                    <!-- Mensaje principal -->
                     <div><h4 class="font-bold text-gray-900 mb-1">Mensaje principal</h4>
                     <p class="text-sm text-gray-700">${data.mensaje_principal}</p></div>
 
-                    <div><h4 class="font-bold text-gray-900 mb-1">Características técnicas detectadas</h4>
-                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.caracteristicas_tecnicas || []).map(c => `<li>${c}</li>`).join('')}</ul></div>
-                                        ${data.afirmaciones_tecnicas_verificables && data.afirmaciones_tecnicas_verificables.length > 0 ? `
-                    <div class="border-l-4 border-blue-400 pl-4 py-3 bg-blue-50 rounded-r-lg mt-3">
-                        <h4 class="font-bold text-gray-900 mb-2">Afirmaciones técnicas verificables</h4>
-                        ${data.afirmaciones_tecnicas_verificables.map(atv => `
-                            <div class="mb-3">
-                                <p class="text-sm font-semibold text-gray-800 italic">"${atv.afirmacion}"</p>
-                                <p class="text-xs text-gray-600 mt-1"><span class="font-semibold">Sustento declarado en la pieza:</span> ${atv.sustento_declarado}</p>
-                                <p class="text-xs text-gray-500 mt-1 italic">Esta observación corresponde a la verificabilidad de la información técnica y no constituye por sí misma una alegación ambiental ni un indicio de greenwashing.</p>
-                            </div>
-                        `).join('')}
-                    </div>` : ''}
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="border rounded-lg p-3 ${data.alegacion_explicita?.presente ? 'bg-red-50 border-red-300' : 'bg-green-50 border-green-300'}">
-                            <h4 class="font-bold text-gray-900 mb-1">Alegación ambiental explícita</h4>
-                            <p class="text-lg font-bold ${data.alegacion_explicita?.presente ? 'text-red-600' : 'text-green-600'}">${data.alegacion_explicita?.presente ? 'PRESENTE' : 'NO DETECTADA'}</p>
-                            ${data.alegacion_explicita?.texto ? `<p class="text-sm text-gray-700 mt-1 italic">"${data.alegacion_explicita.texto}"</p>` : ''}
-                            ${data.alegacion_explicita?.descripcion ? `<p class="text-sm text-gray-600 mt-1">${data.alegacion_explicita.descripcion}</p>` : ''}
+                    <!-- DETERMINANTES D1-D8 -->
+                    <div class="border border-gray-300 rounded-lg overflow-hidden">
+                        <div class="bg-gray-800 px-4 py-2">
+                            <h4 class="font-bold text-white text-sm">Matriz de determinantes observacionales (D1–D8)</h4>
                         </div>
-                        <div class="border rounded-lg p-3 ${data.alegacion_implicita?.presente ? 'bg-red-50 border-red-300' : 'bg-green-50 border-green-300'}">
-                            <h4 class="font-bold text-gray-900 mb-1">Alegación ambiental implícita</h4>
-                            <p class="text-lg font-bold ${data.alegacion_implicita?.presente ? 'text-red-600' : 'text-green-600'}">${data.alegacion_implicita?.presente ? 'PRESENTE' : 'NO DETECTADA'}</p>
-                            ${data.alegacion_implicita?.elementos_convergentes?.length ? `<ul class="list-disc pl-4 text-sm text-gray-700 mt-1">${data.alegacion_implicita.elementos_convergentes.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
-                            ${data.alegacion_implicita?.significado_construido ? `<p class="text-sm text-gray-600 mt-1">${data.alegacion_implicita.significado_construido}</p>` : ''}
+                        <div class="divide-y divide-gray-100">
+                            <div class="grid grid-cols-3 px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase">
+                                <span>Código</span><span>Determinante</span><span>Valor codificado</span>
+                            </div>
+                            <div class="grid grid-cols-3 px-4 py-2 text-sm">
+                                <span class="font-bold text-gray-600">D1</span>
+                                <span class="text-gray-700">Configuración del producto</span>
+                                <span class="font-semibold text-blue-700">${det.D1_configuracion_producto || '—'}</span>
+                            </div>
+                            <div class="grid grid-cols-3 px-4 py-2 text-sm bg-gray-50">
+                                <span class="font-bold text-gray-600">D2</span>
+                                <span class="text-gray-700">Contexto representacional</span>
+                                <span class="font-semibold text-blue-700">${det.D2_contexto_representacional || '—'}</span>
+                            </div>
+                            <div class="grid grid-cols-3 px-4 py-2 text-sm">
+                                <span class="font-bold text-gray-600">D3</span>
+                                <span class="text-gray-700">Componente verbal</span>
+                                <span class="font-semibold ${colorD3[det.D3_componente_verbal] || 'text-gray-700'}">${det.D3_componente_verbal || '—'}</span>
+                            </div>
+                            <div class="px-4 py-2 text-sm bg-gray-50">
+                                <div class="grid grid-cols-3">
+                                    <span class="font-bold text-gray-600">D4</span>
+                                    <span class="text-gray-700">Recursos ambientales visuales</span>
+                                    <span class="font-semibold ${colorD4[det.D4_recursos_ambientales_visuales] || 'text-gray-700'}">${det.D4_recursos_ambientales_visuales || '—'}</span>
+                                </div>
+                                ${det.D4_descripcion ? `<p class="text-xs text-gray-500 mt-1 pl-0 italic">${det.D4_descripcion}</p>` : ''}
+                            </div>
+                            <div class="grid grid-cols-3 px-4 py-2 text-sm">
+                                <span class="font-bold text-gray-600">D5</span>
+                                <span class="text-gray-700">Relación producto–entorno</span>
+                                <span class="font-semibold ${colorD5[det.D5_relacion_producto_entorno] || 'text-gray-700'}">${det.D5_relacion_producto_entorno || '—'}</span>
+                            </div>
+                            <div class="px-4 py-2 text-sm bg-gray-50">
+                                <div class="grid grid-cols-3">
+                                    <span class="font-bold text-gray-600">D6</span>
+                                    <span class="text-gray-700">Afirmación técnica verificable</span>
+                                    <span class="font-semibold text-blue-700">${det.D6_afirmacion_tecnica_verificable || '—'}</span>
+                                </div>
+                                ${det.D6_detalle && det.D6_detalle.length > 0 ? `
+                                <div class="mt-1 pl-0">
+                                    ${det.D6_detalle.map(d => `<p class="text-xs text-gray-600 italic">"${d.afirmacion}" — <span class="font-semibold">Sustento:</span> ${d.sustento_declarado}</p>`).join('')}
+                                </div>` : ''}
+                            </div>
+                            <div class="px-4 py-2 text-sm">
+                                <div class="grid grid-cols-3">
+                                    <span class="font-bold text-gray-600">D7</span>
+                                    <span class="text-gray-700">Anclaje ambiental</span>
+                                    <span class="font-bold ${colorD7[det.D7_anclaje_ambiental] || 'text-gray-700'}">${det.D7_anclaje_ambiental || '—'}</span>
+                                </div>
+                                ${det.D7_justificacion ? `<p class="text-xs text-gray-500 mt-1 italic">${det.D7_justificacion}</p>` : ''}
+                            </div>
+                            <div class="px-4 py-2 text-sm bg-gray-50">
+                                <div class="grid grid-cols-3">
+                                    <span class="font-bold text-gray-600">D8</span>
+                                    <span class="text-gray-700">Asociación cultural</span>
+                                    <span class="font-semibold text-purple-700">${Array.isArray(det.D8_asociacion_cultural) ? det.D8_asociacion_cultural.join(', ') : (det.D8_asociacion_cultural || '—')}</span>
+                                </div>
+                                ${det.D8_confianza ? `<p class="text-xs text-gray-500 mt-1">Confianza: <span class="font-semibold">${det.D8_confianza}</span></p>` : ''}
+                                ${det.D8_evidencia ? `<p class="text-xs text-gray-500 italic">${det.D8_evidencia}</p>` : ''}
+                            </div>
                         </div>
                     </div>
 
-                    ${(data.alegacion_explicita?.presente || data.alegacion_implicita?.presente) ? `
-                    <div><h4 class="font-bold text-gray-900 mb-1">Recursos asociados a la alegación ambiental</h4>
-                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.recursos_visuales_asociados || []).map(r => `<li>${r}</li>`).join('')}</ul></div>` : ''}
-                    
+                    <!-- TIPOLOGÍA ASIGNADA -->
+                    <div class="border-2 ${tipColor} rounded-lg p-4">
+                        <p class="text-xs font-medium uppercase tracking-wide mb-1">Tipología preliminar asignada</p>
+                        <p class="text-2xl font-bold mb-1">${data.tipologia || '—'} — ${data.tipologia_nombre || ''}</p>
+                        <p class="text-sm mb-2">${data.tipologia_justificacion || ''}</p>
+                        <p class="text-sm font-bold">¿Activa análisis riguroso? ${tipDecision}</p>
+                    </div>
 
+                    <!-- Características técnicas -->
+                    <div><h4 class="font-bold text-gray-900 mb-1">Características técnicas detectadas</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.caracteristicas_tecnicas || []).map(c => `<li>${c}</li>`).join('')}</ul></div>
+
+                    <!-- Declaraciones -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border rounded-lg p-3 ${(data.declaracion_explicita?.presente || data.alegacion_explicita?.presente) ? 'bg-red-50 border-red-300' : 'bg-green-50 border-green-300'}">
+                            <h4 class="font-bold text-gray-900 mb-1">Declaración ambiental explícita</h4>
+                            <p class="text-lg font-bold ${(data.declaracion_explicita?.presente || data.alegacion_explicita?.presente) ? 'text-red-600' : 'text-green-600'}">${(data.declaracion_explicita?.presente || data.alegacion_explicita?.presente) ? 'PRESENTE' : 'NO DETECTADA'}</p>
+                            ${(data.declaracion_explicita?.texto || data.alegacion_explicita?.texto) ? `<p class="text-sm text-gray-700 mt-1 italic">"${data.declaracion_explicita?.texto || data.alegacion_explicita?.texto}"</p>` : ''}
+                            ${(data.declaracion_explicita?.descripcion || data.alegacion_explicita?.descripcion) ? `<p class="text-sm text-gray-600 mt-1">${data.declaracion_explicita?.descripcion || data.alegacion_explicita?.descripcion}</p>` : ''}
+                        </div>
+                        <div class="border rounded-lg p-3 ${(data.declaracion_implicita?.presente || data.alegacion_implicita?.presente) ? 'bg-red-50 border-red-300' : 'bg-green-50 border-green-300'}">
+                            <h4 class="font-bold text-gray-900 mb-1">Declaración ambiental implícita</h4>
+                            <p class="text-lg font-bold ${(data.declaracion_implicita?.presente || data.alegacion_implicita?.presente) ? 'text-red-600' : 'text-green-600'}">${(data.declaracion_implicita?.presente || data.alegacion_implicita?.presente) ? 'PRESENTE' : 'NO DETECTADA'}</p>
+                            ${(data.declaracion_implicita?.elementos_convergentes?.length || data.alegacion_implicita?.elementos_convergentes?.length) ? `<ul class="list-disc pl-4 text-sm text-gray-700 mt-1">${(data.declaracion_implicita?.elementos_convergentes || data.alegacion_implicita?.elementos_convergentes || []).map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
+                            ${(data.declaracion_implicita?.significado_construido || data.alegacion_implicita?.significado_construido) ? `<p class="text-sm text-gray-600 mt-1">${data.declaracion_implicita?.significado_construido || data.alegacion_implicita?.significado_construido}</p>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Recursos asociados (solo si hay declaración) -->
+                    ${((data.declaracion_explicita?.presente || data.alegacion_explicita?.presente) || (data.declaracion_implicita?.presente || data.alegacion_implicita?.presente)) ? `
+                    <div><h4 class="font-bold text-gray-900 mb-1">Recursos asociados a la declaración ambiental</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-700">${(data.recursos_visuales_asociados || []).map(r => `<li>${r}</li>`).join('')}</ul></div>` : ''}
+
+                    <!-- Clasificación preliminar y decisión -->
                     <div class="border-2 ${color} rounded-lg p-4">
                         <p class="text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">Clasificación preliminar</p>
                         <p class="text-xl font-bold mb-2">${etiqueta}</p>
                         <p class="text-sm text-gray-700 mb-3">${data.decision_pertinencia}</p>
-                        ${data.clasificacion === 'ALEGACION_IDENTIFICADA' || data.clasificacion === 'ALEGACION_AMBIGUA' ? 
-                        `<p class="text-xs text-gray-500 italic">El alcance, sustento, verificabilidad y contextualización de esta alegación serán evaluados en la siguiente fase.</p>` : ''}
+                        ${(data.clasificacion === 'DECLARACION_IDENTIFICADA' || data.clasificacion === 'ALEGACION_IDENTIFICADA' || data.clasificacion === 'DECLARACION_AMBIGUA' || data.clasificacion === 'ALEGACION_AMBIGUA') ?
+                        `<p class="text-xs text-gray-500 italic">El alcance, sustento, verificabilidad y contextualización de esta declaración serán evaluados en la siguiente fase.</p>` : ''}
                     </div>
 
-                </div>
-            `;
+                </div>`;
+
             document.getElementById('depuracion-content').innerHTML = html;
 
-            if (data.clasificacion === 'ALEGACION_IDENTIFICADA' || data.clasificacion === 'ALEGACION_AMBIGUA') {
+            if (['DECLARACION_IDENTIFICADA','ALEGACION_IDENTIFICADA','DECLARACION_AMBIGUA','ALEGACION_AMBIGUA'].includes(data.clasificacion) || tipActiva || tipRevision) {
                 document.getElementById('continuar-analisis-container').classList.remove('hidden');
             }
         }
